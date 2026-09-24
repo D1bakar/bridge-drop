@@ -78,6 +78,95 @@ body {
   padding-left: var(--edge);
 }
 
+/* Primary action — design.md §6: 32px text link + arrow, size = hierarchy */
+.action-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-3);
+  font-size: var(--text-subheading);
+  line-height: var(--leading-subheading);
+  letter-spacing: var(--tracking-subheading);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+  text-decoration: none;
+  min-height: var(--hit-min);
+  transition: opacity var(--duration) var(--ease);
+}
+
+.action-primary:hover,
+.action-primary:active {
+  opacity: var(--opacity-pressed);
+}
+
+/* Section label pill — design.md §6: Bone bg, Ash border, radius 70, wayfinding only */
+.devices-section {
+  margin-top: var(--section-gap);
+}
+
+.pill {
+  display: inline-block;
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-ash);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+}
+
+.devices {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+
+/* Device row — design.md §6: subheading name, label meta, hairline rhythm, no fill */
+.device {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 72px;
+  padding: var(--space-2) 0;
+  border-top: var(--hairline);
+}
+
+.device:last-child {
+  border-bottom: var(--hairline);
+}
+
+.device-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-meta {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  opacity: 0.6;
+}
+
+.device-name {
+  font-size: var(--text-subheading);
+  line-height: var(--leading-subheading);
+  letter-spacing: var(--tracking-subheading);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+}
+
+.device.is-selected .device-name {
+  font-weight: var(--weight-medium);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
