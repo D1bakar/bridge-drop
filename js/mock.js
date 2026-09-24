@@ -1,8 +1,8 @@
-/* Frontend-only mock. Backend untouched per rule.
- * BACKEND CONTRACT (prd.md §9, do not call yet):
+/* Home data — mock first, server when reachable.
+ * BACKEND CONTRACT (prd.md §9):
  *   GET /v1/info — device info + capabilities
- *   POST /v1/session — sender offers files
- * Frontend uses MOCK_DEVICES until backend pairing exists.
+ *   GET /v1/files — uploaded files (M0 recent source)
+ *   POST /v1/files — upload (see js/upload.js)
  * Shape mirrors PRD §9 Device {id, name, platform, fingerprint, trusted}.
  */
 
@@ -57,7 +57,54 @@ function renderDevices(devices = MOCK_DEVICES) {
 document.addEventListener('DOMContentLoaded', () => {
   renderDevices();
   renderRecent();
+  refreshRecentFromServer();
 });
+
+function apiBase() {
+  if (window.BridgeUpload && window.BridgeUpload.API_BASE) return window.BridgeUpload.API_BASE;
+  return `http://${window.location.hostname || 'localhost'}:8000`;
+}
+
+function fmtSize(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round((bytes / 1024) * 10) / 10} KB`;
+  return `${Math.round((bytes / (1024 * 1024)) * 10) / 10} MB`;
+}
+
+function fmtTime(mtime) {
+  try {
+    const d = new Date(mtime * 1000);
+    return `Today ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  } catch {
+    return 'Today';
+  }
+}
+
+async function refreshRecentFromServer() {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 1500);
+    const res = await fetch(`${apiBase()}/v1/files`, { signal: ctrl.signal });
+    clearTimeout(t);
+    if (!res.ok) return false;
+    const data = await res.json();
+    if (!data.files || data.files.length === 0) return false;
+    renderRecent(
+      data.files.slice(0, 5).map((f) => ({
+        id: f.name,
+        name: f.name,
+        time: fmtTime(f.mtime),
+        meta: fmtSize(f.size),
+        direction: 'In',
+      }))
+    );
+    return true;
+  } catch {
+    return false; // backend down → keep mock, main stays usable
+  }
+}
+
+window.BridgeRecent = { refresh: refreshRecentFromServer };
 
 function renderRecent(items = MOCK_RECENT) {
   const list = document.getElementById('recent-list');

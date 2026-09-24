@@ -47,7 +47,11 @@ function initUpload() {
   zone.addEventListener("drop", (e) => {
     const files = e.dataTransfer && e.dataTransfer.files;
     if (!files || files.length === 0) return;
-    uploadFile(files[0]).catch(() => {});
+    uploadFile(files[0])
+      .then(() => {
+        if (window.BridgeRecent) window.BridgeRecent.refresh();
+      })
+      .catch(() => {});
   });
 }
 
