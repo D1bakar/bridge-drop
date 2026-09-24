@@ -116,7 +116,9 @@ async def upload_file(file: UploadFile = File(...)):
 
 @app.get("/v1/files")
 def list_files():
-    # M0 recent feed source: name + size + mtime, newest first. No auth yet (LAN only).
+    # M0 recent feed source: name + size + mtime + kind, newest first. No auth yet (LAN only).
+    import mimetypes
+
     items = []
     for p in UPLOAD_ROOT.iterdir():
         if p.name == ".gitkeep" or not p.is_file() or p.suffix == ".part":
@@ -125,7 +127,15 @@ def list_files():
             st = p.stat()
         except OSError:
             continue
-        items.append({"name": p.name, "size": st.st_size, "mtime": st.st_mtime})
+        mime = mimetypes.guess_type(p.name)[0] or ""
+        items.append(
+            {
+                "name": p.name,
+                "size": st.st_size,
+                "mtime": st.st_mtime,
+                "kind": "image" if mime.startswith("image/") else "file",
+            }
+        )
     items.sort(key=lambda r: r["mtime"], reverse=True)
     return {"files": items}
 
