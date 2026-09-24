@@ -66,6 +66,18 @@ body {
   opacity: var(--opacity-pressed);
 }
 
+/* Monument — design.md §6/§8: one oversized element, left-bleeding, stacked */
+.monument {
+  font-size: var(--text-monument);
+  line-height: var(--leading-monument);
+  letter-spacing: var(--tracking-monument);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+  margin: var(--above-monument) 0 0;
+  margin-left: calc(-1 * var(--edge));
+  padding-left: var(--edge);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
