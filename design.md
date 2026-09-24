@@ -89,6 +89,8 @@ Level	Name	Value	Purpose
 
 No shadows. No gradients. No blur. No scrims. [S] If something must feel "above", make it larger and tighter, or take over the whole canvas. Modals become full-canvas takeovers, not floating cards. [A]
 
+Amendment 24 Sep 2026 (owner override): restrained warm elevation allowed on nested surfaces only — dropzone (`--shadow-1`, `--shadow-2` on drag) and photo thumbnails (`--shadow-thumb`). Ink at low alpha, never colored glow. Canvas, pills, rows stay flat. Tokens in `css/tokens.css`.
+
 6. Components
 Wordmark [S]
 
