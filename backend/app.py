@@ -128,3 +128,17 @@ def list_files():
         items.append({"name": p.name, "size": st.st_size, "mtime": st.st_mtime})
     items.sort(key=lambda r: r["mtime"], reverse=True)
     return {"files": items}
+
+
+@app.get("/v1/files/{name}")
+def download_file(name: str):
+    # M0 access path: open/download what was shared. Traversal-safe per PRD §10.
+    safe = sanitize_filename(name)
+    target = (UPLOAD_ROOT / safe).resolve()
+    if UPLOAD_ROOT.resolve() not in target.parents and target != UPLOAD_ROOT.resolve():
+        raise HTTPException(status_code=404, detail="not found")
+    if safe == ".gitkeep" or target.suffix == ".part" or not target.is_file():
+        raise HTTPException(status_code=404, detail="not found")
+    from fastapi.responses import FileResponse
+
+    return FileResponse(path=str(target), filename=target.name)
