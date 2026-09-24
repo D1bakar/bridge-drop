@@ -124,6 +124,49 @@ body {
   padding: 0;
 }
 
+/* Device row — design.md §6: subheading name, label meta, hairline rhythm, no fill */
+.device {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 72px;
+  padding: var(--space-2) 0;
+  border-top: var(--hairline);
+}
+
+.device:last-child {
+  border-bottom: var(--hairline);
+}
+
+.device-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.device-meta {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  opacity: 0.6;
+}
+
+.device-name {
+  font-size: var(--text-subheading);
+  line-height: var(--leading-subheading);
+  letter-spacing: var(--tracking-subheading);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+}
+
+.device.is-selected .device-name {
+  font-weight: var(--weight-medium);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
