@@ -108,8 +108,10 @@ body {
   padding: var(--surface-pad);
   min-height: 240px;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
   transition: border-color var(--duration) var(--ease);
 }
 
@@ -135,6 +137,37 @@ body {
   letter-spacing: var(--tracking-heading-sm);
   font-weight: var(--weight-regular);
   text-transform: none;
+}
+
+/* Secondary action link — design.md §6: 15px text link + arrow, no box */
+.action-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-2);
+  font-size: var(--text-body);
+  line-height: 1.2;
+  letter-spacing: var(--tracking-body);
+  font-weight: var(--weight-medium);
+  color: var(--color-ink);
+  text-decoration: none;
+  min-height: var(--hit-min);
+  cursor: pointer;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.action-secondary:hover,
+.action-secondary:active {
+  opacity: var(--opacity-pressed);
+}
+
+/* Native picker kept keyboard-focusable, opened via the label (phone browsers) */
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
 }
 
 /* Section label pill — design.md §6: Bone bg, Ash border, radius 70, wayfinding only */
@@ -254,7 +287,8 @@ body {
 }
 
 /* Visible keyboard focus for every link — design.md §6 */
-a:focus-visible {
+a:focus-visible,
+.action-secondary:focus-visible {
   outline: 2px solid var(--color-ink);
   outline-offset: 4px;
   border-radius: var(--radius-surface);
