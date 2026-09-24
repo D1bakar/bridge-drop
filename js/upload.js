@@ -44,15 +44,25 @@ function uploadFile(file) {
 function initUpload() {
   const zone = document.getElementById("dropzone");
   if (!zone) return;
-  zone.addEventListener("drop", (e) => {
-    const files = e.dataTransfer && e.dataTransfer.files;
+  const sendFirst = (files) => {
     if (!files || files.length === 0) return;
     uploadFile(files[0])
       .then(() => {
         if (window.BridgeRecent) window.BridgeRecent.refresh();
       })
       .catch(() => {});
+  };
+  zone.addEventListener("drop", (e) => {
+    sendFirst(e.dataTransfer && e.dataTransfer.files);
   });
+  // Phone path: no drag-drop on touch — native picker via the label.
+  const picker = document.getElementById("file-input");
+  if (picker) {
+    picker.addEventListener("change", () => {
+      sendFirst(picker.files);
+      picker.value = ""; // allow re-picking the same file
+    });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", initUpload);
