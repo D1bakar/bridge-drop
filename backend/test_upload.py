@@ -74,3 +74,13 @@ def test_download_guards():
     assert client.get("/v1/files/.gitkeep").status_code == 404
     assert client.get("/v1/files/..%2Fapp.py").status_code in (404, 422)
     _clean("app.py")
+
+
+def test_list_kinds():
+    _clean("pic.jpg", "doc.txt")
+    client.post("/v1/files", files={"file": ("pic.jpg", b"\xff\xd8fake")})
+    client.post("/v1/files", files={"file": ("doc.txt", b"hi")})
+    kinds = {f["name"]: f["kind"] for f in client.get("/v1/files").json()["files"]}
+    assert kinds["pic.jpg"] == "image"
+    assert kinds["doc.txt"] == "file"
+    _clean("pic.jpg", "doc.txt")

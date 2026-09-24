@@ -88,16 +88,24 @@ async function refreshRecentFromServer() {
     clearTimeout(t);
     if (!res.ok) return false;
     const data = await res.json();
-    if (!data.files || data.files.length === 0) return false;
+    if (!data.files) return false;
+    if (data.files.length === 0) {
+      renderRecentEmpty(); // server up, nothing shared yet — no fake mock
+      return true;
+    }
     renderRecent(
-      data.files.slice(0, 5).map((f) => ({
-        id: f.name,
-        name: f.name,
-        time: fmtTime(f.mtime),
-        meta: fmtSize(f.size),
-        direction: 'In',
-        url: `${apiBase()}/v1/files/${encodeURIComponent(f.name)}`,
-      }))
+      data.files.slice(0, 5).map((f) => {
+        const url = `${apiBase()}/v1/files/${encodeURIComponent(f.name)}`;
+        return {
+          id: f.name,
+          name: f.name,
+          time: fmtTime(f.mtime),
+          meta: fmtSize(f.size),
+          direction: 'In',
+          url,
+          thumb: f.kind === 'image' ? url : null,
+        };
+      })
     );
     return true;
   } catch {
@@ -107,6 +115,29 @@ async function refreshRecentFromServer() {
 
 window.BridgeRecent = { refresh: refreshRecentFromServer };
 
+function renderRecentEmpty() {
+  // Design §6 empty state: heading text, one → link. No illustration.
+  const list = document.getElementById('recent-list');
+  if (!list) return;
+  list.textContent = '';
+  const li = document.createElement('li');
+  li.className = 'recent-empty';
+  const title = document.createElement('span');
+  title.className = 'recent-empty-title';
+  title.textContent = 'Nothing here yet.';
+  const link = document.createElement('a');
+  link.className = 'action-secondary';
+  link.href = '#dropzone';
+  link.textContent = 'Share a file ';
+  const arrow = document.createElement('span');
+  arrow.setAttribute('aria-hidden', 'true');
+  arrow.textContent = '→';
+  link.appendChild(arrow);
+  li.appendChild(title);
+  li.appendChild(link);
+  list.appendChild(li);
+}
+
 function renderRecent(items = MOCK_RECENT) {
   const list = document.getElementById('recent-list');
   if (!list) return;
@@ -114,6 +145,16 @@ function renderRecent(items = MOCK_RECENT) {
   items.forEach((r) => {
     const li = document.createElement('li');
     li.className = 'recent-row';
+
+    // Design §6: 48px square thumbnail, original color — images only, never icons.
+    if (r.thumb) {
+      const thumb = document.createElement('img');
+      thumb.className = 'recent-thumb';
+      thumb.src = r.thumb;
+      thumb.alt = '';
+      thumb.loading = 'lazy';
+      li.appendChild(thumb);
+    }
 
     const main = document.createElement('div');
     main.className = 'recent-main';
