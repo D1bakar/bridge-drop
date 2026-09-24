@@ -80,15 +80,34 @@ function fmtTime(mtime) {
   }
 }
 
+function setNetStatus(live) {
+  // Design §6 status without color: words + border weight carry the meaning.
+  const pill = document.getElementById('net-status');
+  if (!pill) return;
+  pill.textContent = live ? 'Live' : 'Mock';
+  if (live) {
+    pill.classList.remove('pill-attention');
+  } else {
+    pill.classList.add('pill-attention');
+  }
+}
+
 async function refreshRecentFromServer() {
   try {
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 1500);
     const res = await fetch(`${apiBase()}/v1/files`, { signal: ctrl.signal });
     clearTimeout(t);
-    if (!res.ok) return false;
+    if (!res.ok) {
+      setNetStatus(false);
+      return false;
+    }
     const data = await res.json();
-    if (!data.files) return false;
+    if (!data.files) {
+      setNetStatus(false);
+      return false;
+    }
+    setNetStatus(true);
     if (data.files.length === 0) {
       renderRecentEmpty(); // server up, nothing shared yet — no fake mock
       return true;
@@ -109,7 +128,8 @@ async function refreshRecentFromServer() {
     );
     return true;
   } catch {
-    return false; // backend down → keep mock, main stays usable
+    setNetStatus(false); // backend down → mock shown, pill says so
+    return false;
   }
 }
 
