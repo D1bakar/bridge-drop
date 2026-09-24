@@ -110,6 +110,7 @@ async function refreshRecentFromServer() {
     setNetStatus(true);
     if (data.files.length === 0) {
       renderRecentEmpty(); // server up, nothing shared yet — no fake mock
+      setNetStatus(true);
       return true;
     }
     renderRecent(
