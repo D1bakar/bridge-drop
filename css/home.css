@@ -18,6 +18,16 @@ body {
   padding-right: var(--edge);
 }
 
+/* Wordmark — design.md §6: Basis/Inter 700, 32px, ink, top-left at edge padding */
+.wordmark {
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+  padding-top: var(--space-3);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
