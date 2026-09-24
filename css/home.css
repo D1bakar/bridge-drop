@@ -17,6 +17,8 @@ body {
   padding-left: max(var(--edge), env(safe-area-inset-left));
   padding-right: max(var(--edge), env(safe-area-inset-right));
   padding-bottom: env(safe-area-inset-bottom);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 /* Wordmark — design.md §6: Basis/Inter 700, 32px, ink, top-left at edge padding */
@@ -64,9 +66,14 @@ body {
   opacity: 1;
 }
 
-.topnav a:hover,
 .topnav a:active {
   opacity: var(--opacity-pressed);
+}
+
+@media (hover: hover) {
+  .topnav a:hover {
+    opacity: var(--opacity-pressed);
+  }
 }
 
 /* Narrow phones: tighter nav rhythm, links may wrap instead of crushing */
@@ -110,9 +117,14 @@ body {
   transition: opacity var(--duration) var(--ease);
 }
 
-.action-primary:hover,
 .action-primary:active {
   opacity: var(--opacity-pressed);
+}
+
+@media (hover: hover) {
+  .action-primary:hover {
+    opacity: var(--opacity-pressed);
+  }
 }
 
 /* Drop zone idle — design.md §6: transparent, 1px Ash, radius 10, min-height 240, label only */
@@ -140,19 +152,34 @@ body {
   color: var(--color-ink);
 }
 
-/* Drop zone drag-over — design.md §6: 2px Ink border, text swaps to heading-sm */
-.dropzone:hover,
+/* Drop zone drag-over — design.md §6: 2px Ink border, text swaps to heading-sm
+   :hover gated behind hover-capable pointers so touch taps don't stick */
 .dropzone.is-dragover {
   border: 2px solid var(--color-ink);
 }
 
-.dropzone:hover .dropzone-label,
+@media (hover: hover) {
+  .dropzone:hover {
+    border: 2px solid var(--color-ink);
+  }
+}
+
 .dropzone.is-dragover .dropzone-label {
   font-size: var(--text-heading-sm);
   line-height: var(--leading-heading-sm);
   letter-spacing: var(--tracking-heading-sm);
   font-weight: var(--weight-regular);
   text-transform: none;
+}
+
+@media (hover: hover) {
+  .dropzone:hover .dropzone-label {
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-heading-sm);
+    letter-spacing: var(--tracking-heading-sm);
+    font-weight: var(--weight-regular);
+    text-transform: none;
+  }
 }
 
 /* Secondary action link — design.md §6: 15px text link + arrow, no box */
@@ -172,9 +199,14 @@ body {
   transition: opacity var(--duration) var(--ease);
 }
 
-.action-secondary:hover,
 .action-secondary:active {
   opacity: var(--opacity-pressed);
+}
+
+@media (hover: hover) {
+  .action-secondary:hover {
+    opacity: var(--opacity-pressed);
+  }
 }
 
 /* Native picker kept keyboard-focusable, opened via the label (phone browsers) */
@@ -306,12 +338,20 @@ body {
 a.recent-name {
   color: var(--color-ink);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--hit-min);
   transition: opacity var(--duration) var(--ease);
 }
 
-a.recent-name:hover,
 a.recent-name:active {
   opacity: var(--opacity-pressed);
+}
+
+@media (hover: hover) {
+  a.recent-name:hover {
+    opacity: var(--opacity-pressed);
+  }
 }
 
 /* Visible keyboard focus for every link — design.md §6 */
