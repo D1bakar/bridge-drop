@@ -352,7 +352,6 @@ body {
   min-width: 0;
 }
 
-.recent-time,
 .recent-meta {
   font-size: var(--text-caption);
   line-height: var(--leading-small);

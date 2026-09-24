@@ -159,10 +159,6 @@ function renderRecent(items = MOCK_RECENT) {
     const main = document.createElement('div');
     main.className = 'recent-main';
 
-    const time = document.createElement('span');
-    time.className = 'recent-time';
-    time.textContent = r.time;
-
     const nameEl = r.url ? document.createElement('a') : document.createElement('span');
     nameEl.className = 'recent-name';
     nameEl.textContent = r.name;
@@ -172,11 +168,11 @@ function renderRecent(items = MOCK_RECENT) {
       nameEl.rel = 'noopener';
     }
 
+    // One calm meta line instead of two stacked captions.
     const meta = document.createElement('span');
     meta.className = 'recent-meta';
-    meta.textContent = r.meta;
+    meta.textContent = `${r.time} · ${r.meta}`;
 
-    main.appendChild(time);
     main.appendChild(nameEl);
     main.appendChild(meta);
 
