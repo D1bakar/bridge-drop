@@ -151,7 +151,8 @@ body {
   align-items: flex-start;
   justify-content: center;
   position: relative;
-  transition: border-color var(--duration) var(--ease);
+  box-shadow: var(--shadow-1);
+  transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
 }
 
 .dropzone-label {
@@ -167,6 +168,7 @@ body {
    Plain mouse hover never triggers it: hover is not a drag. */
 .dropzone.is-dragover {
   border: 2px solid var(--color-ink);
+  box-shadow: var(--shadow-2);
 }
 
 .dropzone.is-dragover .dropzone-label {
@@ -332,6 +334,7 @@ body {
   border-radius: var(--radius-surface);
   object-fit: cover;
   flex-shrink: 0;
+  box-shadow: var(--shadow-thumb);
 }
 
 /* Empty state — design.md §6: heading text, one → link, no illustration */
