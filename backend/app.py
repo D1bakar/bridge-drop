@@ -5,7 +5,9 @@ Contract (frontend untouched, still on mock.js):
   GET /v1/info — device info + capabilities
 """
 
-from fastapi import FastAPI
+from pathlib import Path
+
+from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(title="Bridge M0")
@@ -17,6 +19,51 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "OPTIONS"],
     allow_headers=["*"],
 )
+
+UPLOAD_ROOT = Path(__file__).parent / "uploads"
+UPLOAD_ROOT.mkdir(exist_ok=True)
+
+_RESERVED = {
+    "con", "prn", "aux", "nul",
+    *(f"com{i}" for i in range(1, 10)),
+    *(f"lpt{i}" for i in range(1, 10)),
+}
+
+
+def sanitize_filename(name: str) -> str:
+    # PRD §10: never write outside save root, handle .., reserved names, controls.
+    base = (name or "").replace("\\", "/").split("/")[-1].strip()
+    base = "".join(c for c in base if ord(c) >= 32 and c != "/")
+    base = base.lstrip(". ")
+    if not base:
+        base = "file"
+    stem, dot, ext = base.rpartition(".")
+    if not stem:  # no ext or leading-dot name
+        stem, ext = base, ""
+    else:
+        ext = "." + ext[:10]
+    if stem.lower() in _RESERVED:
+        stem = "_" + stem
+    stem = stem[:120] or "file"
+    return f"{stem}{ext}" if ext else stem
+
+
+def unique_path(name: str) -> Path:
+    safe = sanitize_filename(name)
+    target = UPLOAD_ROOT / safe
+    if not target.exists():
+        return target
+    stem, dot, ext = safe.rpartition(".")
+    if not stem:
+        stem, ext = safe, ""
+    else:
+        ext = "." + ext
+    i = 1
+    while True:
+        candidate = UPLOAD_ROOT / f"{stem} ({i}){ext}"
+        if not candidate.exists():
+            return candidate
+        i += 1
 
 
 @app.get("/")
@@ -32,6 +79,36 @@ def info():
         "name": "My PC",
         "platform": "Windows",
         "version": "0.1.0",
-        "capabilities": ["info"],
+        "capabilities": ["info", "files"],
         "trusted": True,
     }
+
+
+@app.post("/v1/files", status_code=201)
+async def upload_file(file: UploadFile = File(...)):
+    # PRD §7 reliability: stream to .part, rename on success — no partials in destination.
+    target = unique_path(file.filename or "file")
+    part = target.with_name(target.name + ".part")
+    size = 0
+    try:
+        with part.open("wb") as out:
+            while True:
+                chunk = await file.read(1024 * 1024)
+                if not chunk:
+                    break
+                size += len(chunk)
+                out.write(chunk)
+        part.replace(target)
+    except Exception as exc:
+        try:
+            if part.exists():
+                part.unlink()
+        except OSError:
+            pass
+        raise HTTPException(status_code=500, detail="upload failed") from exc
+    finally:
+        try:
+            await file.close()
+        except Exception:
+            pass
+    return {"name": target.name, "size": size}
