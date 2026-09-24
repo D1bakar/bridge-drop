@@ -57,3 +57,20 @@ def test_list_files():
     assert "a.txt" in names and "b.txt" in names
     assert all(f["size"] >= 0 and "mtime" in f for f in r.json()["files"])
     _clean("a.txt", "b.txt")
+
+
+def test_download_roundtrip():
+    _clean("dl.txt")
+    data = b"download me " * 500
+    client.post("/v1/files", files={"file": ("dl.txt", data)})
+    r = client.get("/v1/files/dl.txt")
+    assert r.status_code == 200
+    assert r.content == data
+    _clean("dl.txt")
+
+
+def test_download_guards():
+    assert client.get("/v1/files/nope-nothing.txt").status_code == 404
+    assert client.get("/v1/files/.gitkeep").status_code == 404
+    assert client.get("/v1/files/..%2Fapp.py").status_code in (404, 422)
+    _clean("app.py")

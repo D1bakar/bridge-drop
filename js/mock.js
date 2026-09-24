@@ -96,6 +96,7 @@ async function refreshRecentFromServer() {
         time: fmtTime(f.mtime),
         meta: fmtSize(f.size),
         direction: 'In',
+        url: `${apiBase()}/v1/files/${encodeURIComponent(f.name)}`,
       }))
     );
     return true;
@@ -121,16 +122,21 @@ function renderRecent(items = MOCK_RECENT) {
     time.className = 'recent-time';
     time.textContent = r.time;
 
-    const name = document.createElement('span');
-    name.className = 'recent-name';
-    name.textContent = r.name;
+    const nameEl = r.url ? document.createElement('a') : document.createElement('span');
+    nameEl.className = 'recent-name';
+    nameEl.textContent = r.name;
+    if (r.url) {
+      nameEl.href = r.url;
+      nameEl.target = '_blank';
+      nameEl.rel = 'noopener';
+    }
 
     const meta = document.createElement('span');
     meta.className = 'recent-meta';
     meta.textContent = r.meta;
 
     main.appendChild(time);
-    main.appendChild(name);
+    main.appendChild(nameEl);
     main.appendChild(meta);
 
     const pill = document.createElement('span');
