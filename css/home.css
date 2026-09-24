@@ -12,6 +12,17 @@ body {
   padding: 0;
 }
 
+/* Anchor jumps glide; reduced-motion users get instant jumps (design §7) */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   min-height: 100vh;
   padding-left: max(var(--edge), env(safe-area-inset-left));

@@ -18,15 +18,15 @@
   <header class="top">
     <div class="wordmark">Bridge</div>
     <nav class="topnav" aria-label="Primary">
-      <a href="#" aria-current="page">Home</a>
-      <a href="#">Send</a>
-      <a href="#">History</a>
+      <a href="#home" aria-current="page">Home</a>
+      <a href="#dropzone">Send</a>
+      <a href="#recent">History</a>
       <a href="#">Settings</a>
     </nav>
   </header>
   <main id="home">
     <h1 class="monument">Drop<br />here.</h1>
-    <a class="action-primary" href="#">Send <span aria-hidden="true">→</span></a>
+    <a class="action-primary" href="#dropzone">Send <span aria-hidden="true">→</span></a>
 
     <!-- .is-dragover toggled by js/dropzone.js; picker wired by js/upload.js -->
     <section class="dropzone" id="dropzone" aria-label="Drop files">
@@ -55,7 +55,7 @@
       </ul>
     </section>
 
-    <section class="recent" aria-label="Recent transfers">
+    <section class="recent" id="recent" aria-label="Recent transfers">
       <span class="pill">Recent</span>
       <ul class="recent-list" id="recent-list">
         <li class="recent-row">
