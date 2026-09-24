@@ -78,6 +78,27 @@ body {
   padding-left: var(--edge);
 }
 
+/* Primary action — design.md §6: 32px text link + arrow, size = hierarchy */
+.action-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-3);
+  font-size: var(--text-subheading);
+  line-height: var(--leading-subheading);
+  letter-spacing: var(--tracking-subheading);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+  text-decoration: none;
+  min-height: var(--hit-min);
+  transition: opacity var(--duration) var(--ease);
+}
+
+.action-primary:hover,
+.action-primary:active {
+  opacity: var(--opacity-pressed);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
