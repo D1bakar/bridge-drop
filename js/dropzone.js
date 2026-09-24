@@ -6,18 +6,29 @@
 function initDropzone() {
   const zone = document.getElementById('dropzone');
   if (!zone) return;
-  const on = (e) => {
+  let depth = 0;
+  zone.addEventListener('dragenter', (e) => {
     e.preventDefault();
+    depth += 1;
     zone.classList.add('is-dragover');
-  };
-  const off = (e) => {
+  });
+  zone.addEventListener('dragover', (e) => {
     e.preventDefault();
+  });
+  zone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    depth = Math.max(0, depth - 1);
+    if (depth === 0) zone.classList.remove('is-dragover');
+  });
+  zone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    depth = 0;
     zone.classList.remove('is-dragover');
-  };
-  zone.addEventListener('dragenter', on);
-  zone.addEventListener('dragover', on);
-  zone.addEventListener('dragleave', off);
-  zone.addEventListener('drop', off);
+  });
+  document.addEventListener('dragend', () => {
+    depth = 0;
+    zone.classList.remove('is-dragover');
+  });
 }
 
 document.addEventListener('DOMContentLoaded', initDropzone);
