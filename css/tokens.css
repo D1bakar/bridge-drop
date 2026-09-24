@@ -1,0 +1,83 @@
+/* Bridge design tokens — verbatim from design.md §12 (web mode + M0 prototype) */
+
+:root {
+  /* Color */
+  --color-ink: #262523;
+  --color-canvas: #ececec;
+  --color-ash: #cfcdcd;
+  --color-black: #000000;
+
+  /* Fonts */
+  --font-primary: 'Inter', 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+
+  /* Type */
+  --text-monument: clamp(72px, 22vw, 160px);
+  --leading-monument: 0.82;
+  --tracking-monument: -0.06em;
+
+  --text-heading: clamp(48px, 11vw, 120px);
+  --leading-heading: 0.9;
+  --tracking-heading: -0.06em;
+
+  --text-heading-sm: 40px;
+  --leading-heading-sm: 1;
+  --tracking-heading-sm: -0.04em;
+
+  --text-subheading: 32px;
+  --leading-subheading: 0.9;
+  --tracking-subheading: -0.04em;
+
+  --text-body: 15px;
+  --leading-body: 2;      /* prose */
+  --leading-ui: 1.4;      /* dense rows */
+  --tracking-body: -0.02em;
+
+  --text-label: 12px;
+  --text-caption: 12px;
+  --leading-small: 1.2;
+
+  /* Spacing */
+  --space-1: 8px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-5: 40px;
+  --space-6: 48px;
+  --space-10: 80px;
+  --space-20: 160px;
+  --edge: 20px;
+  --section-gap: 48px;
+  --above-monument: 96px;
+  --surface-pad: 24px;
+  --hit-min: 48px;
+
+  /* Shape */
+  --radius-surface: 10px;
+  --radius-pill: 70px;
+  --hairline: 1px solid var(--color-ash);
+
+  /* Motion */
+  --duration: 200ms;
+  --ease: ease-out;
+  --opacity-pressed: 0.6;
+  --opacity-disabled: 0.35;
+}
+
+@media (min-width: 720px) {
+  :root {
+    --edge: 40px;
+    --section-gap: 80px;
+    --above-monument: 160px;
+    --surface-pad: 40px;
+  }
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-primary);
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
