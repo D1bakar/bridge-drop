@@ -28,6 +28,44 @@ body {
   padding-top: var(--space-3);
 }
 
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* Top navigation — design.md §6: text links, label style, 40px gap, no chrome */
+.topnav {
+  display: flex;
+  gap: 40px;
+}
+
+.topnav a {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  opacity: 0.6;
+  text-decoration: none;
+  min-height: var(--hit-min);
+  min-width: var(--hit-min);
+  display: inline-flex;
+  align-items: center;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.topnav a[aria-current="page"] {
+  opacity: 1;
+}
+
+.topnav a:hover,
+.topnav a:active {
+  opacity: var(--opacity-pressed);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
