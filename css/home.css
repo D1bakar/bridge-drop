@@ -121,6 +121,21 @@ body {
   color: var(--color-ink);
 }
 
+/* Drop zone drag-over — design.md §6: 2px Ink border, text swaps to heading-sm */
+.dropzone:hover,
+.dropzone.is-dragover {
+  border: 2px solid var(--color-ink);
+}
+
+.dropzone:hover .dropzone-label,
+.dropzone.is-dragover .dropzone-label {
+  font-size: var(--text-heading-sm);
+  line-height: var(--leading-heading-sm);
+  letter-spacing: var(--tracking-heading-sm);
+  font-weight: var(--weight-regular);
+  text-transform: none;
+}
+
 /* Section label pill — design.md §6: Bone bg, Ash border, radius 70, wayfinding only */
 .devices-section {
   margin-top: var(--section-gap);
