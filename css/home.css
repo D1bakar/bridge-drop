@@ -18,6 +18,66 @@ body {
   padding-right: var(--edge);
 }
 
+/* Wordmark — design.md §6: Basis/Inter 700, 32px, ink, top-left at edge padding */
+.wordmark {
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+  padding-top: var(--space-3);
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+/* Top navigation — design.md §6: text links, label style, 40px gap, no chrome */
+.topnav {
+  display: flex;
+  gap: 40px;
+}
+
+.topnav a {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  opacity: 0.6;
+  text-decoration: none;
+  min-height: var(--hit-min);
+  min-width: var(--hit-min);
+  display: inline-flex;
+  align-items: center;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.topnav a[aria-current="page"] {
+  opacity: 1;
+}
+
+.topnav a:hover,
+.topnav a:active {
+  opacity: var(--opacity-pressed);
+}
+
+/* Monument — design.md §6/§8: one oversized element, left-bleeding, stacked */
+.monument {
+  font-size: var(--text-monument);
+  line-height: var(--leading-monument);
+  letter-spacing: var(--tracking-monument);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+  margin: var(--above-monument) 0 0;
+  margin-left: calc(-1 * var(--edge));
+  padding-left: var(--edge);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
