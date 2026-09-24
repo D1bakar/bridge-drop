@@ -328,6 +328,22 @@ body {
   flex-shrink: 0;
 }
 
+/* Empty state — design.md §6: heading text, one → link, no illustration */
+.recent-empty {
+  padding: var(--space-2) 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+
+.recent-empty-title {
+  display: block;
+  font-size: var(--text-subheading);
+  line-height: var(--leading-subheading);
+  letter-spacing: var(--tracking-subheading);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+}
+
 .recent-main {
   display: flex;
   flex-direction: column;
