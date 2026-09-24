@@ -99,6 +99,28 @@ body {
   opacity: var(--opacity-pressed);
 }
 
+/* Drop zone idle — design.md §6: transparent, 1px Ash, radius 10, min-height 240, label only */
+.dropzone {
+  margin-top: var(--space-3);
+  background: transparent;
+  border: 1px solid var(--color-ash);
+  border-radius: var(--radius-surface);
+  padding: var(--surface-pad);
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.dropzone-label {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+}
+
 /* Section label pill — design.md §6: Bone bg, Ash border, radius 70, wayfinding only */
 .devices-section {
   margin-top: var(--section-gap);
