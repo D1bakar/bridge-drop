@@ -11,6 +11,11 @@ const MOCK_DEVICES = [
   { id: 'ph-1', name: 'My Phone', platform: 'Android', status: 'LAN', trusted: true },
 ];
 
+const MOCK_RECENT = [
+  { id: 'r-1', name: 'IMG_2041.jpg', time: 'Today 12:40', meta: '24.2 MB', direction: 'In' },
+  { id: 'r-2', name: 'notes.txt', time: 'Today 09:12', meta: '2 KB', direction: 'Out' },
+];
+
 function renderDevices(devices = MOCK_DEVICES) {
   const list = document.getElementById('devices-list');
   if (!list) return;
@@ -49,4 +54,44 @@ function renderDevices(devices = MOCK_DEVICES) {
   });
 }
 
-document.addEventListener('DOMContentLoaded', () => renderDevices());
+document.addEventListener('DOMContentLoaded', () => {
+  renderDevices();
+  renderRecent();
+});
+
+function renderRecent(items = MOCK_RECENT) {
+  const list = document.getElementById('recent-list');
+  if (!list) return;
+  list.textContent = '';
+  items.forEach((r) => {
+    const li = document.createElement('li');
+    li.className = 'recent-row';
+
+    const main = document.createElement('div');
+    main.className = 'recent-main';
+
+    const time = document.createElement('span');
+    time.className = 'recent-time';
+    time.textContent = r.time;
+
+    const name = document.createElement('span');
+    name.className = 'recent-name';
+    name.textContent = r.name;
+
+    const meta = document.createElement('span');
+    meta.className = 'recent-meta';
+    meta.textContent = r.meta;
+
+    main.appendChild(time);
+    main.appendChild(name);
+    main.appendChild(meta);
+
+    const pill = document.createElement('span');
+    pill.className = 'pill';
+    pill.textContent = r.direction;
+
+    li.appendChild(main);
+    li.appendChild(pill);
+    list.appendChild(li);
+  });
+}
