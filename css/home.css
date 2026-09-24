@@ -262,6 +262,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .device-meta {
@@ -280,6 +282,12 @@ body {
   letter-spacing: var(--tracking-subheading);
   font-weight: var(--weight-regular);
   color: var(--color-ink);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.device .pill {
+  flex-shrink: 0;
 }
 
 .device.is-selected .device-name {
@@ -315,6 +323,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .recent-time,
@@ -332,6 +342,12 @@ body {
   letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
   color: var(--color-ink);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.recent-row .pill {
+  flex-shrink: 0;
 }
 
 /* Server-backed rows: name stays ink, no underline — tap opens the file */
