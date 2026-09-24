@@ -286,6 +286,18 @@ body {
   color: var(--color-ink);
 }
 
+/* Server-backed rows: name stays ink, no underline — tap opens the file */
+a.recent-name {
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: opacity var(--duration) var(--ease);
+}
+
+a.recent-name:hover,
+a.recent-name:active {
+  opacity: var(--opacity-pressed);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible,
 .action-secondary:focus-visible {
