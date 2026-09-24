@@ -99,6 +99,31 @@ body {
   opacity: var(--opacity-pressed);
 }
 
+/* Section label pill — design.md §6: Bone bg, Ash border, radius 70, wayfinding only */
+.devices-section {
+  margin-top: var(--section-gap);
+}
+
+.pill {
+  display: inline-block;
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  background: var(--color-canvas);
+  border: 1px solid var(--color-ash);
+  border-radius: var(--radius-pill);
+  padding: 6px 12px;
+}
+
+.devices {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
