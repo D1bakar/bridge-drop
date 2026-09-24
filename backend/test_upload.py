@@ -45,3 +45,15 @@ def test_traversal_blocked():
     assert (UPLOAD_ROOT / "evil.txt").exists()
     assert not (UPLOAD_ROOT.parent / "evil.txt").exists()
     _clean("evil.txt")
+
+
+def test_list_files():
+    _clean("a.txt", "b.txt")
+    client.post("/v1/files", files={"file": ("a.txt", b"aaa")})
+    client.post("/v1/files", files={"file": ("b.txt", b"bb")})
+    r = client.get("/v1/files")
+    assert r.status_code == 200
+    names = [f["name"] for f in r.json()["files"]]
+    assert "a.txt" in names and "b.txt" in names
+    assert all(f["size"] >= 0 and "mtime" in f for f in r.json()["files"])
+    _clean("a.txt", "b.txt")

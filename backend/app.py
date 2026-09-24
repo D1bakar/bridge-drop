@@ -112,3 +112,19 @@ async def upload_file(file: UploadFile = File(...)):
         except Exception:
             pass
     return {"name": target.name, "size": size}
+
+
+@app.get("/v1/files")
+def list_files():
+    # M0 recent feed source: name + size + mtime, newest first. No auth yet (LAN only).
+    items = []
+    for p in UPLOAD_ROOT.iterdir():
+        if p.name == ".gitkeep" or not p.is_file() or p.suffix == ".part":
+            continue
+        try:
+            st = p.stat()
+        except OSError:
+            continue
+        items.append({"name": p.name, "size": st.st_size, "mtime": st.st_mtime})
+    items.sort(key=lambda r: r["mtime"], reverse=True)
+    return {"files": items}
