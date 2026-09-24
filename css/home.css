@@ -259,6 +259,11 @@ body {
   padding: 6px 12px;
 }
 
+/* Attention status — design.md §6: words carry meaning, Ink border adds weight */
+.pill-attention {
+  border: 1px solid var(--color-ink);
+}
+
 .devices {
   list-style: none;
   margin: var(--space-2) 0 0;
