@@ -319,6 +319,15 @@ body {
   border-bottom: var(--hairline);
 }
 
+/* Thumbnail — design.md §6: 48px square, radius 10, original color, images only */
+.recent-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-surface);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .recent-main {
   display: flex;
   flex-direction: column;

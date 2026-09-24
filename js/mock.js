@@ -90,14 +90,18 @@ async function refreshRecentFromServer() {
     const data = await res.json();
     if (!data.files || data.files.length === 0) return false;
     renderRecent(
-      data.files.slice(0, 5).map((f) => ({
-        id: f.name,
-        name: f.name,
-        time: fmtTime(f.mtime),
-        meta: fmtSize(f.size),
-        direction: 'In',
-        url: `${apiBase()}/v1/files/${encodeURIComponent(f.name)}`,
-      }))
+      data.files.slice(0, 5).map((f) => {
+        const url = `${apiBase()}/v1/files/${encodeURIComponent(f.name)}`;
+        return {
+          id: f.name,
+          name: f.name,
+          time: fmtTime(f.mtime),
+          meta: fmtSize(f.size),
+          direction: 'In',
+          url,
+          thumb: f.kind === 'image' ? url : null,
+        };
+      })
     );
     return true;
   } catch {
@@ -114,6 +118,16 @@ function renderRecent(items = MOCK_RECENT) {
   items.forEach((r) => {
     const li = document.createElement('li');
     li.className = 'recent-row';
+
+    // Design §6: 48px square thumbnail, original color — images only, never icons.
+    if (r.thumb) {
+      const thumb = document.createElement('img');
+      thumb.className = 'recent-thumb';
+      thumb.src = r.thumb;
+      thumb.alt = '';
+      thumb.loading = 'lazy';
+      li.appendChild(thumb);
+    }
 
     const main = document.createElement('div');
     main.className = 'recent-main';
