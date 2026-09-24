@@ -15,6 +15,8 @@ __pycache__/
 .venv/
 venv/
 *.part
+backend/uploads/*
+!backend/uploads/.gitkeep
 
 # Node (if tooling added later)
 node_modules/
