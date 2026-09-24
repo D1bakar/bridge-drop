@@ -110,6 +110,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  transition: border-color var(--duration) var(--ease);
 }
 
 .dropzone-label {
