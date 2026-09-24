@@ -163,16 +163,10 @@ body {
   color: var(--color-ink);
 }
 
-/* Drop zone drag-over — design.md §6: 2px Ink border, text swaps to heading-sm
-   :hover gated behind hover-capable pointers so touch taps don't stick */
+/* Drop zone drag-over — real drags only (.is-dragover from js/dropzone.js).
+   Plain mouse hover never triggers it: hover is not a drag. */
 .dropzone.is-dragover {
   border: 2px solid var(--color-ink);
-}
-
-@media (hover: hover) {
-  .dropzone:hover {
-    border: 2px solid var(--color-ink);
-  }
 }
 
 .dropzone.is-dragover .dropzone-label {
@@ -183,25 +177,10 @@ body {
   text-transform: none;
 }
 
-@media (hover: hover) {
-  .dropzone:hover .dropzone-label {
-    font-size: var(--text-heading-sm);
-    line-height: var(--leading-heading-sm);
-    letter-spacing: var(--tracking-heading-sm);
-    font-weight: var(--weight-regular);
-    text-transform: none;
-  }
-}
-
-/* While dragging, the big text is the whole message — link fades but holds space */
+/* While a real drag hovers, the big text is the whole message.
+   Link fades but holds space, so nothing jumps. Hover alone changes nothing. */
 .dropzone.is-dragover .action-secondary {
   opacity: 0;
-}
-
-@media (hover: hover) {
-  .dropzone:hover .action-secondary {
-    opacity: 0;
-  }
 }
 
 /* Secondary action link — design.md §6: 15px text link + arrow, no box */
