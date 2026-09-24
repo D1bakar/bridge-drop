@@ -204,6 +204,54 @@ body {
   font-weight: var(--weight-medium);
 }
 
+/* Recent rows — design.md §6: hairline rhythm, body filename, caption meta, no fill */
+.recent {
+  margin-top: var(--section-gap);
+  padding-bottom: var(--section-gap);
+}
+
+.recent-list {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+
+.recent-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-top: var(--hairline);
+}
+
+.recent-row:last-child {
+  border-bottom: var(--hairline);
+}
+
+.recent-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.recent-time,
+.recent-meta {
+  font-size: var(--text-caption);
+  line-height: var(--leading-small);
+  letter-spacing: -0.02em;
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+}
+
+.recent-name {
+  font-size: var(--text-body);
+  line-height: var(--leading-ui);
+  letter-spacing: var(--tracking-body);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+}
+
 /* Visible keyboard focus for every link — design.md §6 */
 a:focus-visible {
   outline: 2px solid var(--color-ink);
