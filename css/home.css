@@ -182,6 +182,17 @@ body {
   }
 }
 
+/* While dragging, the big text is the whole message — link fades but holds space */
+.dropzone.is-dragover .action-secondary {
+  opacity: 0;
+}
+
+@media (hover: hover) {
+  .dropzone:hover .action-secondary {
+    opacity: 0;
+  }
+}
+
 /* Secondary action link — design.md §6: 15px text link + arrow, no box */
 .action-secondary {
   display: inline-flex;
