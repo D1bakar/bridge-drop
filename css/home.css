@@ -14,8 +14,9 @@ body {
 
 body {
   min-height: 100vh;
-  padding-left: var(--edge);
-  padding-right: var(--edge);
+  padding-left: max(var(--edge), env(safe-area-inset-left));
+  padding-right: max(var(--edge), env(safe-area-inset-right));
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Wordmark — design.md §6: Basis/Inter 700, 32px, ink, top-left at edge padding */
@@ -25,13 +26,15 @@ body {
   letter-spacing: -0.04em;
   font-weight: var(--weight-bold);
   color: var(--color-ink);
-  padding-top: var(--space-3);
+  padding-top: calc(var(--space-3) + env(safe-area-inset-top));
 }
 
 .top {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: var(--space-1);
   gap: var(--space-3);
 }
 
@@ -64,6 +67,19 @@ body {
 .topnav a:hover,
 .topnav a:active {
   opacity: var(--opacity-pressed);
+}
+
+/* Narrow phones: tighter nav rhythm, links may wrap instead of crushing */
+@media (max-width: 480px) {
+  .topnav {
+    gap: 24px;
+    flex-wrap: wrap;
+    row-gap: var(--space-1);
+  }
+
+  .topnav a {
+    min-width: 0;
+  }
 }
 
 /* Monument — design.md §6/§8: one oversized element, left-bleeding, stacked */
