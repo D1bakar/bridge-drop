@@ -456,3 +456,20 @@ a:focus-visible,
   outline-offset: 4px;
   border-radius: var(--radius-surface);
 }
+
+/* Pictogram glyph — design.md §6: monochrome line-art inline with display type,
+   cap-height sized, decorative only (aria-hidden in markup). */
+.glyph {
+  display: inline-block;
+  height: 0.58em;
+  width: auto;
+  margin-left: 0.08em;
+  vertical-align: -0.02em;
+  color: var(--color-ink);
+}
+
+/* Text selection stays in the palette: ash field, ink text. */
+::selection {
+  background: var(--color-ash);
+  color: var(--color-ink);
+}
