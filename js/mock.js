@@ -55,10 +55,28 @@ function renderDevices(devices = MOCK_DEVICES) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.BridgeApi && window.BridgeApi.handoffCode()) return; // guest → pair page
   renderDevices();
   renderRecent();
+  refreshDevicesFromServer();
   refreshRecentFromServer();
 });
+
+async function refreshDevicesFromServer() {
+  // Real paired names when the backend is up; mock row otherwise.
+  try {
+    if (!window.BridgeApi) return;
+    const out = await window.BridgeApi.json('/v1/devices');
+    const info = await window.BridgeApi.json('/v1/info').catch(() => null);
+    const devs = [{ name: (info && info.data.name) || 'My PC', platform: 'Windows', trusted: true }];
+    (out.data.devices || []).forEach((d) => {
+      devs.push({ name: d.name, platform: d.platform || 'Device', trusted: true });
+    });
+    renderDevices(devs);
+  } catch (_) {
+    /* mock stays */
+  }
+}
 
 function apiCandidates() {
   // Single-terminal mode: page served from :8000 → same origin, no guessing.
@@ -148,7 +166,8 @@ async function refreshRecentFromServer() {
     }
     renderRecent(
       data.files.slice(0, 5).map((f) => {
-        const url = `${r.base}/v1/files/${encodeURIComponent(f.name)}`;
+        const rel = f.path || f.name;
+        const url = `${r.base}/v1/files/${rel.split('/').map(encodeURIComponent).join('/')}`;
         return {
           id: f.name,
           name: f.name,

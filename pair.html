@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ececec" />
+  <title>Bridge — Pair</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="wordmark">Bridge</div>
+    <nav class="topnav" aria-label="Primary">
+      <a href="/">Home</a>
+      <a href="send.html">Send</a>
+      <a href="history.html">History</a>
+      <a href="pair.html" aria-current="page">Pair</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+  </header>
+  <main>
+    <h1 class="page-heading">Pair.</h1>
+
+    <section id="show-block" aria-label="Pair a new phone">
+      <div class="pair-block">
+        <img class="pair-qr" id="pair-qr" alt="QR code to pair a phone" />
+        <div class="pair-code" id="pair-code">······</div>
+      </div>
+      <p class="recent-meta" id="pair-hint">Loading a fresh code…</p>
+      <a class="action-secondary" href="#" id="new-code">New code <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section id="claim-block" style="display:none" aria-label="Claim this pairing">
+      <p class="recent-meta">Pairing code</p>
+      <div class="pair-code" id="claim-code"></div>
+      <label class="field-label" for="pair-name">This phone is called</label>
+      <input class="field-input" id="pair-name" type="text" maxlength="60"
+             autocomplete="off" placeholder="My phone" />
+      <span class="field-error" id="pair-error"></span>
+      <br />
+      <a class="action-primary" href="#" id="claim-go">Pair this phone <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section id="paired-block" style="display:none" aria-label="Paired">
+      <p class="recent-meta">Paired. Confirm this short code matches the PC screen:</p>
+      <div class="pair-code" id="pair-fingerprint"></div>
+      <br />
+      <a class="action-primary" href="#" id="paired-home">Start sending <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section aria-label="Trusted devices">
+      <span class="pill">Trusted</span>
+      <ul class="devices" id="devices-list"></ul>
+    </section>
+  </main>
+  <script src="js/api.js"></script>
+  <script src="js/pair-page.js"></script>
+</body>
+</html>

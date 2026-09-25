@@ -38,6 +38,18 @@ def test_serves_web_ui_single_terminal():
     assert r.status_code == 200
     assert "Bridge" in r.text
     assert "dropzone" in r.text.lower()
-    for path in ("/css/tokens.css", "/js/mock.js", "/js/upload.js"):
+    for path in ("/css/tokens.css", "/css/pages.css", "/js/mock.js", "/js/upload.js",
+                 "/js/api.js", "/js/batch.js", "/js/feed.js",
+                 "/js/pair-page.js", "/js/settings-page.js"):
         s = client.get(path)
         assert s.status_code == 200, path
+
+
+def test_serves_app_pages():
+    for page, marker in (("send.html", "batch-list"), ("history.html", "feed-list"),
+                         ("pair.html", "pair-qr"), ("settings.html", "rules-list")):
+        r = client.get(f"/{page}")
+        assert r.status_code == 200, page
+        assert marker in r.text, page
+    assert client.get("/nope.html").status_code == 404
+    assert client.get("/../app.py").status_code in (404, 422)
