@@ -33,6 +33,16 @@ body {
   letter-spacing: -0.02em;
   font-weight: 600;
   margin-top: var(--space-3);
+  box-shadow: var(--shadow-btn);
+}
+
+/* Drop zone keeps its base restrained depth, plus a glass top light. */
+.dropzone {
+  box-shadow: var(--shadow-1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.dropzone.is-dragover {
+  box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .action-primary:active {
