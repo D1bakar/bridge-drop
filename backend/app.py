@@ -6,6 +6,7 @@ Contract (frontend untouched, still on mock.js):
 """
 
 from pathlib import Path
+import socket
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,6 +23,21 @@ app.add_middleware(
 
 UPLOAD_ROOT = Path(__file__).parent / "uploads"
 UPLOAD_ROOT.mkdir(exist_ok=True)
+
+
+def get_lan_ip() -> str:
+    # M0 LAN run: phone browsers need the PC's LAN IP, not localhost (prd §4 M0).
+    # UDP trick — no packets sent. Falls back to localhost when offline.
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(("8.8.8.8", 80))
+            ip = s.getsockname()[0]
+            if ip and not ip.startswith("127."):
+                return ip
+    except OSError:
+        pass
+    return "127.0.0.1"
+
 
 _RESERVED = {
     "con", "prn", "aux", "nul",
