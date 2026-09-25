@@ -1,0 +1,224 @@
+/* Bridge app pages — components per design.md §6. Tokens untouched (tokens.css). */
+
+/* Sub-page heading moment: heading token, not monument (design §8). */
+.page-heading {
+  font-size: var(--text-heading);
+  line-height: var(--leading-heading);
+  letter-spacing: var(--tracking-heading);
+  font-weight: var(--weight-regular);
+  color: var(--color-ink);
+  margin: var(--above-monument) 0 0;
+  margin-left: calc(-1 * var(--edge));
+  padding-left: var(--edge);
+}
+
+/* Transfer progress — design §6: numeral is the indicator, 2px line, meta line. */
+.transfer {
+  margin-top: var(--space-3);
+}
+
+.transfer-pct {
+  font-size: var(--text-heading-sm);
+  line-height: var(--leading-heading-sm);
+  letter-spacing: var(--tracking-heading-sm);
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+}
+
+.transfer-line {
+  height: 2px;
+  background: var(--color-ash);
+  margin-top: var(--space-1);
+}
+
+.transfer-fill {
+  height: 2px;
+  width: 0%;
+  background: var(--color-ink);
+}
+
+.transfer-meta {
+  font-size: var(--text-caption);
+  line-height: var(--leading-small);
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  margin-top: var(--space-1);
+  overflow-wrap: anywhere;
+}
+
+.batch-list {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+}
+
+.batch-row {
+  padding: var(--space-2) 0;
+  border-top: var(--hairline);
+}
+
+.batch-row:last-child {
+  border-bottom: var(--hairline);
+}
+
+.batch-line {
+  height: 1px;
+  background: var(--color-ash);
+  margin-top: var(--space-1);
+}
+
+.batch-fill {
+  height: 1px;
+  width: 0%;
+  background: var(--color-ink);
+}
+
+/* Pairing block — design §6: QR ink-on-canvas, quiet zone kept, nested surface. */
+.pair-block {
+  margin-top: var(--space-3);
+  border: 1px solid var(--color-ash);
+  border-radius: var(--radius-surface);
+  padding: var(--surface-pad);
+  display: inline-block;
+}
+
+.pair-qr {
+  display: block;
+  width: min(280px, 100%);
+  height: auto;
+}
+
+.pair-code {
+  font-size: var(--text-heading-sm);
+  line-height: var(--leading-heading-sm);
+  letter-spacing: var(--tracking-heading-sm);
+  font-weight: var(--weight-regular);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink);
+  margin-top: var(--space-2);
+}
+
+/* Inputs — design §6: transparent, ash border, radius 10, visible label. */
+.field-label {
+  display: block;
+  font-size: var(--text-caption);
+  line-height: var(--leading-small);
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  margin: var(--space-3) 0 var(--space-1);
+}
+
+.field-input,
+.field-area {
+  width: 100%;
+  max-width: 480px;
+  background: transparent;
+  border: 1px solid var(--color-ash);
+  border-radius: var(--radius-surface);
+  color: var(--color-ink);
+  font-size: var(--text-body);
+  font-family: var(--font-primary);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.field-area {
+  min-height: 96px;
+  resize: vertical;
+  line-height: var(--leading-ui);
+}
+
+.field-input:focus,
+.field-area:focus {
+  outline: none;
+  border: 2px solid var(--color-ink);
+  padding: 15px;
+}
+
+.field-error {
+  font-size: var(--text-caption);
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  margin-top: var(--space-1);
+}
+
+/* Settings rows — design §6: label left, value as → link right. */
+.settings-list {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  max-width: 480px;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-top: var(--hairline);
+}
+
+.settings-row:last-child {
+  border-bottom: var(--hairline);
+}
+
+.settings-name {
+  font-size: var(--text-body);
+  line-height: var(--leading-ui);
+  letter-spacing: var(--tracking-body);
+  color: var(--color-ink);
+}
+
+/* Toast — design §6: bone, ink border, radius 10, auto-dismiss. */
+.toast {
+  position: fixed;
+  left: max(var(--edge), env(safe-area-inset-left));
+  right: max(var(--edge), env(safe-area-inset-right));
+  bottom: calc(var(--space-3) + env(safe-area-inset-bottom));
+  background: var(--color-canvas);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-surface);
+  color: var(--color-ink);
+  font-size: var(--text-body);
+  padding: 16px;
+  opacity: 1;
+  transition: opacity var(--duration) var(--ease);
+  z-index: 50;
+}
+
+.toast.is-fading {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    transition: none;
+  }
+}
+
+/* Pending incoming card — design §6 incoming takeover, compact inline form. */
+.pending {
+  margin-top: var(--space-3);
+  border: 1px solid var(--color-ink);
+  border-radius: var(--radius-surface);
+  padding: var(--surface-pad);
+  max-width: 480px;
+}
+
+/* Crossfade between pages — design §7: 200ms, instant on reduced motion. */
+main {
+  animation: page-in var(--duration) var(--ease);
+}
+
+@keyframes page-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main {
+    animation: none;
+  }
+}
