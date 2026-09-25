@@ -3,7 +3,10 @@
  * Backend down → "Backend off — is :8000 running?" Mock list untouched (c4 refreshes it).
  */
 
-const API_BASE = `http://${window.location.hostname || "localhost"}:8000`;
+const RAW_HOST = window.location.hostname || "localhost";
+// localhost can resolve to ::1 while uvicorn binds 127.0.0.1 — prefer IPv4.
+const API_HOST = RAW_HOST === "localhost" ? "127.0.0.1" : RAW_HOST;
+const API_BASE = `http://${API_HOST}:8000`;
 
 function setDropLabel(text) {
   const label = document.querySelector("#dropzone .dropzone-label");
