@@ -109,8 +109,39 @@ input[type="range"].clarity-range {
   outline-offset: 4px;
 }
 
-/* Bottom tab bar — phone only (max-width: 719px). Desktop keeps top text-nav.
- * Monochrome: Canvas fill, Ash top hairline, weight carries active state. */
+/* Grouped glass cards — iOS inset-grouped lists, monochrome.
+ * Container card, inset dividers, soft lift. Covers Home, History, Pair, Settings, Send. */
+.devices,
+.recent-list,
+.settings-list,
+.batch-list {
+  background: #f4f4f4;
+  border: 1px solid var(--color-ash);
+  border-radius: var(--apple-card-radius);
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(38, 37, 35, 0.06),
+    0 8px 20px rgba(38, 37, 35, 0.08);
+}
+
+.devices .device,
+.recent-list .recent-row,
+.settings-list .settings-row,
+.batch-list .batch-row {
+  border-top: none;
+  border-bottom: 1px solid var(--color-ash);
+  margin: 0 16px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.devices .device:last-child,
+.recent-list .recent-row:last-child,
+.settings-list .settings-row:last-child,
+.batch-list .batch-row:last-child {
+  border-bottom: none;
+}
+
+/* Bottom tab bar — phone only (max-width: 719px). Desktop keeps top text-nav. */
 .tabbar {
   display: none;
 }
