@@ -21,8 +21,9 @@ def test_manifest_served():
 def test_service_worker_served():
     r = client.get("/sw.js")
     assert r.status_code == 200
-    assert "bridge-v1" in r.text
+    assert "const CACHE = 'bridge-v" in r.text
     assert "/v1/" in r.text  # API stays network-only
+    assert "/css/apple.css" in r.text  # new layers must reach phones, not stale cache
 
 
 def test_icons_served():
