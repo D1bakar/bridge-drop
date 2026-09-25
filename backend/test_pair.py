@@ -89,3 +89,28 @@ def test_guest_upload_pending_then_accepted_when_auto_accept_off():
         (UPLOAD_ROOT / "g.txt").unlink()
     finally:
         db.set_setting("auto_accept", "1")
+
+
+def test_feed_accept_and_decline_paths():
+    db.set_setting("auto_accept", "0")
+    try:
+        from test_chunked import _put
+        from app import UPLOAD_ROOT
+        code = client.post("/v1/pair/code").json()["code"]
+        data = b"via feed accept"
+        uid = client.post("/v1/uploads/init", json={"name": "fa.txt", "size": len(data)},
+                          params={"code": code}).json()["uploadId"]
+        _put(uid, data, 0)
+        tid = client.post(f"/v1/uploads/{uid}/complete").json()["id"]
+        acc = client.post(f"/v1/feed/accept/{tid}").json()
+        assert acc["name"] == "fa.txt"
+        assert (UPLOAD_ROOT / "fa.txt").read_bytes() == data
+        (UPLOAD_ROOT / "fa.txt").unlink()
+        uid2 = client.post("/v1/uploads/init", json={"name": "fd.txt", "size": 3},
+                           params={"code": code}).json()["uploadId"]
+        _put(uid2, b"bye", 0)
+        tid2 = client.post(f"/v1/uploads/{uid2}/complete").json()["id"]
+        assert client.post(f"/v1/feed/decline/{tid2}").json()["declined"] is True
+        assert client.post(f"/v1/feed/accept/{tid2}").status_code == 404
+    finally:
+        db.set_setting("auto_accept", "1")

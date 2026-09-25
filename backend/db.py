@@ -85,6 +85,10 @@ def connect() -> sqlite3.Connection:
 def init_db() -> None:
     with connect() as conn:
         conn.executescript(_SCHEMA)
+        # Light migrations for existing installs.
+        cols = {r["name"] for r in conn.execute("PRAGMA table_info(chunked)")}
+        if "transfer_id" not in cols:
+            conn.execute("ALTER TABLE chunked ADD COLUMN transfer_id TEXT NOT NULL DEFAULT ''")
         conn.commit()
 
 

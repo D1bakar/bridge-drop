@@ -286,6 +286,23 @@ def root():
     return {"ok": True, "service": "bridge-m0"}
 
 
+_PAGES = {"send.html", "history.html", "pair.html", "settings.html"}
+
+
+@app.get("/{page}")
+def page(page: str):
+    # App screens as separate pages (no SPA router — works in any phone browser).
+    from fastapi.responses import FileResponse
+
+    name = page.strip().replace("\\", "/").split("/")[-1]
+    if name not in _PAGES:
+        raise HTTPException(status_code=404, detail="not found")
+    target = (WEB_ROOT / name).resolve()
+    if WEB_ROOT.resolve() not in target.parents or not target.is_file():
+        raise HTTPException(status_code=404, detail="not found")
+    return FileResponse(path=str(target), media_type="text/html")
+
+
 @app.get("/v1/info")
 def info():
     # Mirrors js/mock.js MOCK_DEVICES[0] shape (PRD §9 Device). No auth yet (M0 LAN only).
@@ -623,11 +640,12 @@ def _finalize_upload(uid: str, payload: dict | None, force: bool):
         raise HTTPException(status_code=422, detail="hash mismatch — re-send the file")
     if u["peer_id"].startswith("guest:") and not _auto_accept() and not force:
         # FR-13: unknown sender waits for an explicit Accept in the UI.
-        with db.connect() as conn:
-            conn.execute("UPDATE chunked SET status='pending' WHERE id=?", (uid,))
-            conn.commit()
         tid = record_transfer(u["peer_id"], "in", "file", u["name"], u["size"],
                               u["mime"], got, "pending", "")
+        with db.connect() as conn:
+            conn.execute("UPDATE chunked SET status='pending', transfer_id=? WHERE id=?",
+                         (tid, uid))
+            conn.commit()
         return {"pending": True, "id": tid, "name": u["name"], "size": u["size"]}
     root = UPLOAD_ROOT
     if u["save_dir"]:
@@ -817,6 +835,46 @@ def upload_decline(uid: str):
     if u["status"] != "pending":
         raise HTTPException(status_code=409, detail=f"upload {u['status']}")
     upload_cancel(uid)
+    return {"ok": True, "declined": True}
+
+
+def _upload_for_transfer(tid: str) -> dict:
+    with db.connect() as conn:
+        t = conn.execute("SELECT * FROM transfers WHERE id=?", (tid,)).fetchone()
+        if not t or t["status"] != "pending" or t["kind"] != "file":
+            raise HTTPException(status_code=404, detail="no pending transfer")
+        u = conn.execute("SELECT * FROM chunked WHERE transfer_id=?", (tid,)).fetchone()
+        if not u:
+            raise HTTPException(status_code=404, detail="no staged upload")
+        return dict(u)
+
+
+@app.post("/v1/feed/accept/{tid}")
+def feed_accept(tid: str):
+    u = _upload_for_transfer(tid)
+    with db.connect() as conn:
+        conn.execute("UPDATE chunked SET status='uploading' WHERE id=?", (u["id"],))
+        conn.commit()
+    out = _finalize_upload(u["id"], None, force=True)
+    with db.connect() as conn:
+        conn.execute("DELETE FROM transfers WHERE id=?", (tid,))
+        conn.commit()
+    return out
+
+
+@app.post("/v1/feed/decline/{tid}")
+def feed_decline(tid: str):
+    u = _upload_for_transfer(tid)
+    tmp = UPLOAD_ROOT / u["tmp_name"]
+    try:
+        if tmp.exists():
+            tmp.unlink()
+    except OSError:
+        pass
+    with db.connect() as conn:
+        conn.execute("UPDATE chunked SET status='cancelled' WHERE id=?", (u["id"],))
+        conn.execute("UPDATE transfers SET status='cancelled' WHERE id=?", (tid,))
+        conn.commit()
     return {"ok": True, "declined": True}
 
 
