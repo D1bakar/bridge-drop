@@ -432,3 +432,37 @@ a:focus-visible,
   outline-offset: 4px;
   border-radius: var(--radius-surface);
 }
+
+/* Compact density (feat/compact-shell): fit phone + 480x720, tokens untouched. */
+.dropzone {
+  min-height: 160px;
+}
+
+.devices-section {
+  margin-top: var(--space-3);
+}
+
+.recent {
+  margin-top: var(--space-3);
+  padding-bottom: var(--space-2);
+}
+
+.device {
+  min-height: 64px;
+  padding: 12px 0;
+}
+
+@media (max-height: 760px) {
+  .monument {
+    margin-top: 40px;
+  }
+
+  .action-primary {
+    margin-top: var(--space-2);
+  }
+
+  .dropzone {
+    margin-top: var(--space-2);
+    padding: 20px;
+  }
+}
