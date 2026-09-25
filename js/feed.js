@@ -139,7 +139,11 @@
 
   async function delItem(kind, id, li) {
     try {
-      await window.BridgeApi.json('/v1/feed/' + kind + '/' + encodeURIComponent(id), { method: 'DELETE' });
+      // Files: delete row + disk together, otherwise boot reconcile
+      // re-creates the row from the orphan file and it "comes back".
+      var path = '/v1/feed/' + kind + '/' + encodeURIComponent(id);
+      if (kind === 'file') path += '?delete_file=1';
+      await window.BridgeApi.json(path, { method: 'DELETE' });
       li.remove();
       window.BridgeApi.toast('Deleted →');
     } catch (e) {
@@ -184,7 +188,9 @@
 
   async function delById(kind, id) {
     try {
-      await window.BridgeApi.json('/v1/feed/' + kind + '/' + encodeURIComponent(id), { method: 'DELETE' });
+      var path = '/v1/feed/' + kind + '/' + encodeURIComponent(id);
+      if (kind === 'file') path += '?delete_file=1';
+      await window.BridgeApi.json(path, { method: 'DELETE' });
       loadFeed(currentQ());
       window.BridgeApi.toast('Deleted →');
       return true;
