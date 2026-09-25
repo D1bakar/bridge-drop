@@ -291,10 +291,10 @@ def info():
     # Mirrors js/mock.js MOCK_DEVICES[0] shape (PRD §9 Device). No auth yet (M0 LAN only).
     return {
         "id": "pc-1",
-        "name": "My PC",
+        "name": db.get_setting("device_name", "My PC") or "My PC",
         "platform": "Windows",
         "version": "0.1.0",
-        "capabilities": ["info", "files"],
+        "capabilities": ["info", "files", "snippets", "chunked", "pair"],
         "trusted": True,
     }
 
@@ -818,3 +818,68 @@ def upload_decline(uid: str):
         raise HTTPException(status_code=409, detail=f"upload {u['status']}")
     upload_cancel(uid)
     return {"ok": True, "declined": True}
+
+
+# --- Settings + save rules (PRD FR-30, FR-16) --------------------------------
+
+@app.get("/v1/settings")
+def get_settings():
+    return {
+        "device_name": db.get_setting("device_name", "My PC") or "My PC",
+        "auto_accept": db.get_setting("auto_accept", "1") == "1",
+        "visibility": db.get_setting("visibility", "visible"),
+        "save_root": str(UPLOAD_ROOT),
+    }
+
+
+@app.patch("/v1/settings")
+def patch_settings(payload: dict):
+    out = {}
+    if "device_name" in payload:
+        name = str(payload["device_name"] or "").strip()[:60]
+        if not name:
+            raise HTTPException(status_code=422, detail="device name required")
+        db.set_setting("device_name", name)
+        out["device_name"] = name
+    if "auto_accept" in payload:
+        val = "1" if payload["auto_accept"] else "0"
+        db.set_setting("auto_accept", val)
+        out["auto_accept"] = val == "1"
+    if "visibility" in payload:
+        vis = str(payload["visibility"] or "")
+        if vis not in ("visible", "hidden"):
+            raise HTTPException(status_code=422, detail="visibility must be visible|hidden")
+        db.set_setting("visibility", vis)
+        out["visibility"] = vis
+    return out
+
+
+@app.get("/v1/rules")
+def list_rules():
+    return {"rules": get_rules()}
+
+
+@app.post("/v1/rules", status_code=201)
+def add_rule(payload: dict):
+    import json
+
+    ext = str(payload.get("ext", "") or "").strip().lower()
+    dest = sanitize_filename(str(payload.get("dir", "") or "").strip())[:60]
+    if not ext.startswith(".") or len(ext) < 2 or len(ext) > 12:
+        raise HTTPException(status_code=422, detail="ext like .mp4 required")
+    if not dest:
+        raise HTTPException(status_code=422, detail="dir required")
+    rules = [r for r in get_rules() if r.get("ext") != ext]
+    rules.append({"ext": ext, "dir": dest})
+    db.set_setting("rules", json.dumps(rules))
+    return {"ok": True, "rules": rules}
+
+
+@app.delete("/v1/rules")
+def delete_rule(ext: str):
+    import json
+
+    ext = ext.strip().lower()
+    rules = [r for r in get_rules() if r.get("ext") != ext]
+    db.set_setting("rules", json.dumps(rules))
+    return {"ok": True, "rules": rules}
