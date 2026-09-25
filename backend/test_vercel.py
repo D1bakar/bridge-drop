@@ -20,6 +20,18 @@ def test_api_entry_points_at_backend():
     assert "from app import app" in src
 
 
+def test_pair_url_echoes_request_host():
+    # Cloud QR must encode the public host, never the container's 169.254 IP.
+    import app as backend_app
+    from fastapi.testclient import TestClient
+
+    c = TestClient(backend_app.app)
+    body = c.post("/v1/pair/code", headers={
+        "host": "bridge-demo.vercel.app", "x-forwarded-proto": "https"}).json()
+    assert body["url"] == f"https://bridge-demo.vercel.app/?code={body['code']}"
+    assert "169.254" not in body["url"]
+
+
 def test_root_requirements_pinned():
     txt = (ROOT / "requirements.txt").read_text()
     assert "fastapi==" in txt and "qrcode" in txt
