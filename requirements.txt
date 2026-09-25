@@ -1,0 +1,4 @@
+fastapi==0.116.1
+python-multipart==0.0.32
+qrcode==8.2
+pillow==12.3.0

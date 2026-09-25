@@ -1,0 +1,8 @@
+backend/uploads/
+backend/bridge.db*
+backend/__pycache__/
+backend/.pytest_cache/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo

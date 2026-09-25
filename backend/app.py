@@ -10,6 +10,7 @@ Contract (frontend untouched, still on mock.js):
 from pathlib import Path
 import hashlib
 import mimetypes
+import os
 import socket
 import uuid
 from contextlib import asynccontextmanager
@@ -63,8 +64,8 @@ app.add_middleware(
 )
 
 
-UPLOAD_ROOT = Path(__file__).parent / "uploads"
-UPLOAD_ROOT.mkdir(exist_ok=True)
+UPLOAD_ROOT = Path(os.environ.get("BRIDGE_UPLOAD_DIR", str(Path(__file__).parent / "uploads")))
+UPLOAD_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Single-terminal M0: serve the web-mode UI from the backend so the phone
 # opens one URL (no Live Server, no CORS, no host guessing). PRD §4 M0.
