@@ -2,7 +2,7 @@
 
 from fastapi.testclient import TestClient
 
-from app import app
+from app import app, get_lan_ip
 
 client = TestClient(app)
 
@@ -23,3 +23,10 @@ def test_cors_preflight():
     )
     assert r.status_code == 200
     assert r.headers["access-control-allow-origin"] == "*"
+
+
+def test_get_lan_ip_returns_ipv4():
+    ip = get_lan_ip()
+    parts = ip.split(".")
+    assert len(parts) == 4
+    assert all(p.isdigit() and 0 <= int(p) <= 255 for p in parts)

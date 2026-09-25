@@ -1,28 +1,16 @@
 """Bridge M0 backend skeleton — PRD §9 contract starts here.
 
-Run: uvicorn app:app --reload --port 8000  (from backend/)
+Run: uvicorn app:app --reload --host 0.0.0.0 --port 8000  (from backend/)
 Contract (frontend untouched, still on mock.js):
   GET /v1/info — device info + capabilities
 """
 
 from pathlib import Path
 import socket
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-
-app = FastAPI(title="Bridge M0")
-
-# M0 LAN-only: allow Live Server + phone browsers. TODO(prd §10): pin origins + TLS + auth.
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["GET", "POST", "PUT", "OPTIONS"],
-    allow_headers=["*"],
-)
-
-UPLOAD_ROOT = Path(__file__).parent / "uploads"
-UPLOAD_ROOT.mkdir(exist_ok=True)
 
 
 def get_lan_ip() -> str:
@@ -37,6 +25,31 @@ def get_lan_ip() -> str:
     except OSError:
         pass
     return "127.0.0.1"
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # M0 gate (prd §4): print what the phone browser must open.
+    # --host 0.0.0.0 required; localhost alone is unreachable from the phone.
+    ip = get_lan_ip()
+    print("Bridge M0 up — PC:   http://127.0.0.1:8000/v1/info", flush=True)
+    print(f"Bridge M0 up — Phone (same Wi-Fi): http://{ip}:8000/v1/info", flush=True)
+    yield
+
+
+app = FastAPI(title="Bridge M0", lifespan=lifespan)
+
+# M0 LAN-only: allow Live Server + phone browsers. TODO(prd §10): pin origins + TLS + auth.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST", "PUT", "OPTIONS"],
+    allow_headers=["*"],
+)
+
+
+UPLOAD_ROOT = Path(__file__).parent / "uploads"
+UPLOAD_ROOT.mkdir(exist_ok=True)
 
 
 _RESERVED = {
