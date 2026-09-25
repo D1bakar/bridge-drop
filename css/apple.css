@@ -9,6 +9,13 @@
   --apple-btn-radius: 999px;
   --apple-btn-pad-y: 14px;
   --apple-btn-pad-x: 24px;
+  /* iOS-like layered depth, monochrome: specular top light, Ink shadows. */
+  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(38, 37, 35, 0.08),
+    0 12px 32px rgba(38, 37, 35, 0.16);
+  --shadow-btn: inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 1px 2px rgba(38, 37, 35, 0.2),
+    0 8px 20px rgba(38, 37, 35, 0.18);
 }
 
 body {
@@ -26,6 +33,16 @@ body {
   letter-spacing: -0.02em;
   font-weight: 600;
   margin-top: var(--space-3);
+  box-shadow: var(--shadow-btn);
+}
+
+/* Drop zone keeps its base restrained depth, plus a glass top light. */
+.dropzone {
+  box-shadow: var(--shadow-1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.dropzone.is-dragover {
+  box-shadow: var(--shadow-2), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .action-primary:active {
@@ -72,7 +89,7 @@ body {
     backdrop-filter: blur(20px) saturate(1.5);
     border: 1px solid var(--color-ash);
     border-radius: 24px;
-    box-shadow: 0 8px 24px rgba(38, 37, 35, 0.12);
+    box-shadow: var(--shadow-glass);
   }
 
   .tabbar a {
@@ -92,6 +109,10 @@ body {
   .tabbar a[aria-current="page"] {
     opacity: 1;
     font-weight: 700;
+    background: rgba(38, 37, 35, 0.08);
+    border-radius: 16px;
+    margin: 6px 2px;
+    min-height: 44px;
   }
 
   .tabbar a:active {
