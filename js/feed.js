@@ -148,26 +148,49 @@
   }
 
   async function acceptPending(item) {
+    return acceptById(item.id);
+  }
+
+  async function acceptById(id) {
     try {
-      // chunked uploads carry the transfer id in feed; accept via uploads endpoint needs uid.
-      // Pending feed rows store the transfer id — resolve uid through status lookup is not
-      // exposed, so re-complete path: ask server to accept by transfer id.
+      // Pending feed rows store the transfer id; the server resolves the
+      // staged upload from it.
       window.BridgeApi.toast('Accepting…');
-      await window.BridgeApi.json('/v1/feed/accept/' + encodeURIComponent(item.id), { method: 'POST' });
+      await window.BridgeApi.json('/v1/feed/accept/' + encodeURIComponent(id), { method: 'POST' });
       loadFeed(currentQ());
       window.BridgeApi.toast('Received →');
+      return true;
     } catch (e) {
       window.BridgeApi.toast('Accept failed — try again.');
+      return false;
     }
   }
 
   async function declinePending(item) {
+    return declineById(item.id);
+  }
+
+  async function declineById(id) {
     try {
-      await window.BridgeApi.json('/v1/feed/decline/' + encodeURIComponent(item.id), { method: 'POST' });
+      await window.BridgeApi.json('/v1/feed/decline/' + encodeURIComponent(id), { method: 'POST' });
       loadFeed(currentQ());
       window.BridgeApi.toast('Declined →');
+      return true;
     } catch (e) {
       window.BridgeApi.toast('Decline failed — try again.');
+      return false;
+    }
+  }
+
+  async function delById(kind, id) {
+    try {
+      await window.BridgeApi.json('/v1/feed/' + kind + '/' + encodeURIComponent(id), { method: 'DELETE' });
+      loadFeed(currentQ());
+      window.BridgeApi.toast('Deleted →');
+      return true;
+    } catch (e) {
+      window.BridgeApi.toast('Delete failed — try again.');
+      return false;
     }
   }
 
@@ -243,5 +266,5 @@
   }
 
   document.addEventListener('DOMContentLoaded', initFeed);
-  window.BridgeFeed = { load: loadFeed };
+  window.BridgeFeed = { load: loadFeed, del: delById, accept: acceptById, decline: declineById };
 })();
