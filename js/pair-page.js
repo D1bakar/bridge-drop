@@ -40,6 +40,13 @@
     try {
       var out = await window.BridgeApi.json('/v1/pair/code', { method: 'POST' });
       showCode(out.data.code);
+      // prd §11: show the exact address the phone must open, no guessing.
+      var info = await window.BridgeApi.json('/v1/info').catch(function () { return null; });
+      if (info && info.data && info.data.lan_url) {
+        el('lan-url').textContent = 'Phone opens ' + info.data.lan_url;
+      } else {
+        el('lan-url').textContent = '';
+      }
     } catch (e) {
       window.BridgeApi.toast('Pairing offline — is :8000 running?');
     }
