@@ -94,6 +94,21 @@ the M1 native app), no off-LAN relay or WebRTC (M4), no mutual-TLS (LAN HTTP +
 one-time codes + trusted-device tokens; enable OS firewall + Private profile).
 Dark theme deferred per `design.md`.
 
+## Deploy — Vercel (demo cloud)
+
+The LAN run above is the real product (your PC is the server). The Vercel
+deploy is a try-anywhere demo + installable PWA over HTTPS:
+
+```powershell
+npm i -g vercel; vercel login; vercel --prod
+```
+
+What works there: all pages, snippets, small uploads, QR/pairing, PWA install.
+Hard limits (serverless, by design): `/tmp` storage is ephemeral — uploads and
+history vanish on cold starts; functions time out (~10 s Hobby), so multi-GB
+resumable transfers belong on the LAN run, not here. Never treat the demo URL
+as private storage.
+
 ## Git flow
 
 `main` always runnable. Work on `feat/*` branches, micro-commits, PR → merge →
