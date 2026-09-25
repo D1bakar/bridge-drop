@@ -100,6 +100,52 @@ body {
   }
 }
 
+/* Compact mobile density — phone-first (design §11: phone is source of truth).
+ * Page scrolls naturally; nothing locked or clipped. Tokens file untouched;
+ * overrides below only. Desktop (≥720px) unchanged. */
+@media (max-width: 719px) {
+  :root {
+    --above-monument: 48px;
+    --section-gap: 32px;
+    --surface-pad: 20px;
+  }
+
+  .monument {
+    font-size: clamp(56px, 17vw, 88px);
+  }
+
+  .action-primary {
+    font-size: 28px;
+    margin-top: var(--space-2);
+  }
+
+  .dropzone {
+    min-height: 160px;
+    margin-top: var(--space-2);
+  }
+
+  .device {
+    min-height: 64px;
+    padding: 12px 0;
+  }
+
+  .device-name {
+    font-size: 26px;
+  }
+
+  .recent-row {
+    padding: 12px 0;
+  }
+
+  .recent-empty-title {
+    font-size: 26px;
+  }
+
+  .topnav {
+    gap: 20px;
+  }
+}
+
 /* Monument — design.md §6/§8: one oversized element, left-bleeding, stacked */
 .monument {
   font-size: var(--text-monument);
