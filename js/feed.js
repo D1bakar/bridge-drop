@@ -238,6 +238,7 @@
       return;
     }
     try {
+      if (window.BridgeSpin) window.BridgeSpin(true);
       await window.BridgeApi.json('/v1/snippets', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -250,6 +251,8 @@
       if (window.BridgeRecent) window.BridgeRecent.refresh();
     } catch (e) {
       if (err) err.textContent = 'Send failed — is :8000 running?';
+    } finally {
+      if (window.BridgeSpin) window.BridgeSpin(false);
     }
   }
 
