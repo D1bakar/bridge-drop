@@ -156,6 +156,15 @@ input[type="range"].clarity-range {
     display: none;
   }
 
+  /* iOS large title on sub-pages — 34px bold, phone only. Home monument stays. */
+  .page-heading {
+    font-size: 34px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    margin-top: 24px;
+  }
+
   .tabbar {
     display: flex;
     position: fixed;
