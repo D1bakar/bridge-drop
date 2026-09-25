@@ -60,9 +60,30 @@ document.addEventListener('DOMContentLoaded', () => {
   refreshRecentFromServer();
 });
 
+function apiCandidates() {
+  // Single-terminal mode: page served from :8000 → same origin, no guessing.
+  // Live Server mode (:5500 / file://): backend is :8000 on same host.
+  // localhost → ::1 often misses a 127.0.0.1-only uvicorn, so try IPv4 first.
+  try {
+    const port = window.location.port;
+    if (port === "8000" && window.location.origin && window.location.origin.startsWith("http")) {
+      const origin = window.location.origin.replace(/\/$/, "");
+      return [origin, "http://127.0.0.1:8000", "http://localhost:8000"].filter(
+        (v, i, a) => a.indexOf(v) === i
+      );
+    }
+  } catch (_) {}
+  const raw = (window.location.hostname || "localhost").toLowerCase();
+  const host = raw === "localhost" ? "127.0.0.1" : raw;
+  const list = [`http://${host}:8000`];
+  if (!list.includes("http://127.0.0.1:8000")) list.push("http://127.0.0.1:8000");
+  if (!list.includes("http://localhost:8000")) list.push("http://localhost:8000");
+  return list;
+}
+
 function apiBase() {
   if (window.BridgeUpload && window.BridgeUpload.API_BASE) return window.BridgeUpload.API_BASE;
-  return `http://${window.location.hostname || 'localhost'}:8000`;
+  return apiCandidates()[0];
 }
 
 function fmtSize(bytes) {
@@ -80,42 +101,54 @@ function fmtTime(mtime) {
   }
 }
 
-function setNetStatus(live) {
+function setNetStatus(live, reason) {
   // Design §6 status without color: words + border weight carry the meaning.
   const pill = document.getElementById('net-status');
   if (!pill) return;
   pill.textContent = live ? 'Live' : 'Mock';
   if (live) {
     pill.classList.remove('pill-attention');
+    pill.removeAttribute('title');
   } else {
     pill.classList.add('pill-attention');
+    if (reason) pill.title = reason;
+  }
+}
+
+async function fetchFilesFrom(base, timeoutMs) {
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), timeoutMs);
+  try {
+    const res = await fetch(`${base}/v1/files`, { signal: ctrl.signal });
+    if (!res.ok) return { ok: false, reason: `HTTP ${res.status} from ${base}` };
+    const data = await res.json();
+    if (!data.files) return { ok: false, reason: `bad JSON from ${base}` };
+    return { ok: true, base, data };
+  } catch (e) {
+    const why = e && e.name === 'AbortError' ? `timeout ${timeoutMs}ms to ${base}` : `unreachable ${base}`;
+    return { ok: false, reason: why };
+  } finally {
+    clearTimeout(t);
   }
 }
 
 async function refreshRecentFromServer() {
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 1500);
-    const res = await fetch(`${apiBase()}/v1/files`, { signal: ctrl.signal });
-    clearTimeout(t);
-    if (!res.ok) {
-      setNetStatus(false);
-      return false;
+  const reasons = [];
+  for (const base of apiCandidates()) {
+    const r = await fetchFilesFrom(base, 2500);
+    if (!r.ok) {
+      reasons.push(r.reason);
+      continue;
     }
-    const data = await res.json();
-    if (!data.files) {
-      setNetStatus(false);
-      return false;
-    }
+    const data = r.data;
     setNetStatus(true);
     if (data.files.length === 0) {
       renderRecentEmpty(); // server up, nothing shared yet — no fake mock
-      setNetStatus(true);
       return true;
     }
     renderRecent(
       data.files.slice(0, 5).map((f) => {
-        const url = `${apiBase()}/v1/files/${encodeURIComponent(f.name)}`;
+        const url = `${r.base}/v1/files/${encodeURIComponent(f.name)}`;
         return {
           id: f.name,
           name: f.name,
@@ -128,10 +161,11 @@ async function refreshRecentFromServer() {
       })
     );
     return true;
-  } catch {
-    setNetStatus(false); // backend down → mock shown, pill says so
-    return false;
   }
+  const reason = reasons.join(' · ') || 'backend off';
+  setNetStatus(false, reason); // backend down → mock shown, pill says so
+  if (window.console && console.warn) console.warn('[bridge] recent fallback to mock:', reason);
+  return false;
 }
 
 window.BridgeRecent = { refresh: refreshRecentFromServer };
