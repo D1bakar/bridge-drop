@@ -975,3 +975,45 @@ def delete_rule(ext: str):
     rules = [r for r in get_rules() if r.get("ext") != ext]
     db.set_setting("rules", json.dumps(rules))
     return {"ok": True, "rules": rules}
+
+
+def reconcile_history() -> int:
+    # Boot heal: files that landed before history recording existed (or were
+    # copied in by hand) get history rows, so every visible row is deletable
+    # and nothing silently hides from the feed. created_at = file mtime, so
+    # ordering stays natural. No hashing here — never scan GBs at boot.
+    known: set[str] = set()
+    with db.connect() as conn:
+        for r in conn.execute("SELECT saved_path FROM transfers WHERE kind='file'"):
+            if r["saved_path"]:
+                known.add(r["saved_path"])
+    added = 0
+    for p in UPLOAD_ROOT.rglob("*"):
+        if not p.is_file() or p.suffix == ".part":
+            continue
+        if p.name == ".gitkeep" or p.name.startswith(".up-"):
+            continue
+        try:
+            rel = p.relative_to(UPLOAD_ROOT).as_posix()
+        except ValueError:
+            continue
+        if rel in known:
+            continue
+        try:
+            st = p.stat()
+        except OSError:
+            continue
+        tid = uuid.uuid4().hex[:12]
+        with db.connect() as conn:
+            conn.execute(
+                "INSERT INTO transfers(id, peer_id, direction, kind, name, size, mime,"
+                " sha256, status, saved_path, created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+                (tid, "local", "in", "file", p.name, st.st_size,
+                 mimetypes.guess_type(p.name)[0] or "", "", "done", rel, st.st_mtime),
+            )
+            conn.commit()
+        added += 1
+    return added
+
+
+reconcile_history()
