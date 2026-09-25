@@ -12,6 +12,11 @@
         var origin = window.location.origin.replace(/\/$/, '');
         return dedupe([origin, 'http://127.0.0.1:8000', 'http://localhost:8000']);
       }
+      // Hosted origin (https / default port, e.g. Vercel): same origin serves /v1/*.
+      if ((window.location.protocol || '').indexOf('https') === 0 || !window.location.port) {
+        var hosted = window.location.origin.replace(/\/$/, '');
+        return dedupe([hosted, 'http://127.0.0.1:8000', 'http://localhost:8000']);
+      }
     } catch (_) {}
     var raw = (window.location.hostname || 'localhost').toLowerCase();
     var host = raw === 'localhost' ? '127.0.0.1' : raw;

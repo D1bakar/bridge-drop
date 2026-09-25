@@ -90,6 +90,13 @@ function apiCandidates() {
         (v, i, a) => a.indexOf(v) === i
       );
     }
+    // Hosted origin (https / default port, e.g. Vercel): same origin serves /v1/*.
+    if ((window.location.protocol || "").indexOf("https") === 0 || !port) {
+      const hosted = window.location.origin.replace(/\/$/, "");
+      return [hosted, "http://127.0.0.1:8000", "http://localhost:8000"].filter(
+        (v, i, a) => a.indexOf(v) === i
+      );
+    }
   } catch (_) {}
   const raw = (window.location.hostname || "localhost").toLowerCase();
   const host = raw === "localhost" ? "127.0.0.1" : raw;
