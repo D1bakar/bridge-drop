@@ -17,11 +17,14 @@ def test_version_file_matches_info():
 
 
 def test_bundle_script_includes_boot_excludes_local():
+    # Allowlist design: backend stage copies exactly three runtime files, so
+    # tests, caches, and the local DB can never leak into the zip.
     src = (ROOT / "build-release.ps1").read_text(encoding="utf-8")
     for keep in ("start-bridge.bat", "backend/app.py", "index.html", "sw.js"):
         assert keep in src, keep
-    for drop in ("bridge.db", "test_", "__pycache__", ".vercel"):
-        assert drop in src, f"exclusion missing: {drop}"
+    for runtime in ("backend/app.py", "backend/db.py", "backend/requirements.txt"):
+        assert runtime in src, runtime
+    assert "test_" not in src and "__pycache__" not in src and "bridge.db" not in src
 
 
 def test_bundle_boot_files_present():
