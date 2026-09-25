@@ -182,12 +182,39 @@
     });
     var zone = el('batch-drop');
     if (zone) {
+      var depth = 0;
+      zone.addEventListener('dragenter', function (e) {
+        e.preventDefault();
+        depth += 1;
+        zone.classList.add('is-dragover');
+      });
       zone.addEventListener('dragover', function (e) { e.preventDefault(); });
+      zone.addEventListener('dragleave', function (e) {
+        e.preventDefault();
+        depth = Math.max(0, depth - 1);
+        if (!depth) zone.classList.remove('is-dragover');
+      });
       zone.addEventListener('drop', function (e) {
         e.preventDefault();
+        depth = 0;
+        zone.classList.remove('is-dragover');
         if (e.dataTransfer && e.dataTransfer.files) enqueue(e.dataTransfer.files);
       });
+      document.addEventListener('dragend', function () {
+        depth = 0;
+        zone.classList.remove('is-dragover');
+      });
     }
+    // Keyboard: Enter/Space on a picker label opens the file dialog.
+    document.querySelectorAll('label.action-secondary[for]').forEach(function (lab) {
+      lab.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          var input = document.getElementById(lab.getAttribute('for'));
+          if (input) input.click();
+        }
+      });
+    });
   }
 
   document.addEventListener('DOMContentLoaded', initBatch);

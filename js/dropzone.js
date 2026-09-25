@@ -29,6 +29,16 @@ function initDropzone() {
     depth = 0;
     zone.classList.remove('is-dragover');
   });
+  // Keyboard: Enter/Space on the picker label opens the file dialog.
+  zone.querySelectorAll('label.action-secondary[for]').forEach((lab) => {
+    lab.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const input = document.getElementById(lab.getAttribute('for'));
+        if (input) input.click();
+      }
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', initDropzone);
