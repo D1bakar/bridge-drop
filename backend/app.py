@@ -424,6 +424,48 @@ def feed(q: str = "", kind: str = "", limit: int = 100):
     return {"items": items[:limit]}
 
 
+def _resolve_upload_path(fpath: str) -> Path | None:
+    # Shared guard for file access by path: traversal-safe, inside save root,
+    # never .part staging files, never the .gitkeep marker.
+    if not fpath or fpath.strip() in (".", "/"):
+        return None
+    segs = [sanitize_filename(s) for s in fpath.replace("\\", "/").split("/")]
+    segs = [s for s in segs if s and s not in (".", "..")]
+    if not segs or ".gitkeep" in segs or any(s.startswith(".up-") for s in segs):
+        return None
+    try:
+        target = (UPLOAD_ROOT.joinpath(*segs)).resolve()
+    except (OSError, ValueError):
+        return None
+    if UPLOAD_ROOT.resolve() not in target.parents:
+        return None
+    if target.suffix == ".part" or not target.is_file():
+        return None
+    return target
+
+
+@app.delete("/v1/files/{fpath:path}")
+def delete_file(fpath: str):
+    # Delete anything you shared or received: removes the file from disk AND
+    # every history row pointing at it, so it never haunts the feed.
+    target = _resolve_upload_path(fpath)
+    if target is None:
+        raise HTTPException(status_code=404, detail="not found")
+    try:
+        rel = target.relative_to(UPLOAD_ROOT).as_posix()
+    except ValueError:
+        raise HTTPException(status_code=404, detail="not found")
+    try:
+        target.unlink()
+    except OSError as exc:
+        raise HTTPException(status_code=500, detail="delete failed") from exc
+    with db.connect() as conn:
+        conn.execute("DELETE FROM transfers WHERE saved_path=?", (rel,))
+        conn.execute("DELETE FROM transfers WHERE saved_path=?", (target.name,))
+        conn.commit()
+    return {"ok": True}
+
+
 @app.delete("/v1/feed/file/{tid}")
 def delete_transfer(tid: str, delete_file: bool = False):
     # Delete history row; optionally remove the file from disk too.
@@ -448,16 +490,8 @@ def delete_transfer(tid: str, delete_file: bool = False):
 def download_file(fpath: str):
     # Access path: open/download what was shared. Traversal-safe per PRD §10.
     # Accepts plain names ("a.jpg") and relative paths ("Videos/a.mp4").
-    if not fpath or fpath.strip() in (".", "/"):
-        raise HTTPException(status_code=404, detail="not found")
-    segs = [sanitize_filename(s) for s in fpath.replace("\\", "/").split("/")]
-    segs = [s for s in segs if s and s not in (".", "..")]
-    if not segs or ".gitkeep" in segs:
-        raise HTTPException(status_code=404, detail="not found")
-    target = (UPLOAD_ROOT.joinpath(*segs)).resolve()
-    if UPLOAD_ROOT.resolve() not in target.parents:
-        raise HTTPException(status_code=404, detail="not found")
-    if target.suffix == ".part" or not target.is_file():
+    target = _resolve_upload_path(fpath)
+    if target is None:
         raise HTTPException(status_code=404, detail="not found")
     from fastapi.responses import FileResponse
 
