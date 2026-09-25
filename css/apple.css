@@ -1,0 +1,44 @@
+/* Bridge Apple-like layer — structure without color (design.md amendment 25 Sep 2026).
+ * Monochrome stays binding: Ink fills, Canvas text, Ash hairlines. No accent.
+ * Rolled out one surface per branch; base tokens untouched. Card/nav slices later.
+ */
+
+:root {
+  --font-apple: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --apple-card-radius: 14px;
+  --apple-btn-radius: 999px;
+  --apple-btn-pad-y: 14px;
+  --apple-btn-pad-x: 24px;
+}
+
+body {
+  font-family: var(--font-apple);
+}
+
+/* Primary action as filled Ink pill — Canvas text, arrow kept, same hit area. */
+.action-primary {
+  background: var(--color-ink);
+  color: var(--color-canvas);
+  border-radius: var(--apple-btn-radius);
+  padding: var(--apple-btn-pad-y) var(--apple-btn-pad-x);
+  font-size: 17px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  margin-top: var(--space-3);
+}
+
+.action-primary:active {
+  opacity: var(--opacity-pressed);
+}
+
+@media (hover: hover) {
+  .action-primary:hover {
+    opacity: var(--opacity-pressed);
+  }
+}
+
+.action-primary:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 4px;
+}

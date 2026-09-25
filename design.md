@@ -91,6 +91,8 @@ No shadows. No gradients. No blur. No scrims. [S] If something must feel "above"
 
 Amendment 24 Sep 2026 (owner override): restrained warm elevation allowed on nested surfaces only — dropzone (`--shadow-1`, `--shadow-2` on drag) and photo thumbnails (`--shadow-thumb`). Ink at low alpha, never colored glow. Canvas, pills, rows stay flat. Tokens in `css/tokens.css`.
 
+Amendment 25 Sep 2026 (owner override): Apple-like structure WITHOUT color. Monochrome palette (§2) is binding — Warm Obsidian on Bone White, no accent, no blue. Adopted from Apple: SF system font stack first, filled primary buttons (Ink fill, Canvas text), 17 px body for UI text, card surfaces (Canvas fill, Ash hairline, 12–16 px radius) for rows/zones, bottom tab bar on phone. Rolled out one surface per branch in `css/apple.css`; base tokens and text-link components stay until their slice lands.
+
 6. Components
 Wordmark [S]
 
