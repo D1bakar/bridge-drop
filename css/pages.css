@@ -141,6 +141,8 @@
   line-height: var(--leading-small);
   color: var(--color-ink);
   margin-top: var(--space-1);
+  min-height: calc(var(--text-caption) * var(--leading-small));
+  display: block;
 }
 
 /* Settings rows — design §6: label left, value as → link right. */
@@ -210,6 +212,7 @@
 /* Crossfade between pages — design §7: 200ms, instant on reduced motion. */
 main {
   animation: page-in var(--duration) var(--ease);
+  padding-bottom: var(--space-3);
 }
 
 @keyframes page-in {

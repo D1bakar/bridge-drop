@@ -29,7 +29,10 @@
 
   async function showCode(code) {
     el('pair-code').textContent = code.split('').join(' ');
-    el('pair-qr').src = window.BridgeApi.base() + '/v1/pair/qr?code=' + encodeURIComponent(code);
+    const img = el('pair-qr');
+    img.style.display = 'none';
+    img.onload = () => { img.style.display = ''; };
+    img.src = window.BridgeApi.base() + '/v1/pair/qr?code=' + encodeURIComponent(code);
     el('pair-hint').textContent = 'Scan with the phone camera. Expires in 5 minutes, one use.';
   }
 
