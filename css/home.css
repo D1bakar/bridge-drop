@@ -24,34 +24,12 @@ html {
 }
 
 body {
-  height: 100vh;
-  height: 100dvh;
   min-height: 100vh;
-  min-height: 100dvh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
   padding-left: max(var(--edge), env(safe-area-inset-left));
   padding-right: max(var(--edge), env(safe-area-inset-right));
   padding-bottom: env(safe-area-inset-bottom);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-}
-
-/* Compact shell: page never scrolls — inner lists scroll (phone + 480x720 fit). */
-main#home {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.devices,
-.recent-list {
-  overflow-y: auto;
-  min-height: 0;
-  scrollbar-gutter: stable;
 }
 
 /* Wordmark — design.md §6: Basis/Inter 700, 32px, ink, top-left at edge padding */
@@ -431,38 +409,4 @@ a:focus-visible,
   outline: 2px solid var(--color-ink);
   outline-offset: 4px;
   border-radius: var(--radius-surface);
-}
-
-/* Compact density (feat/compact-shell): fit phone + 480x720, tokens untouched. */
-.dropzone {
-  min-height: 160px;
-}
-
-.devices-section {
-  margin-top: var(--space-3);
-}
-
-.recent {
-  margin-top: var(--space-3);
-  padding-bottom: var(--space-2);
-}
-
-.device {
-  min-height: 64px;
-  padding: 12px 0;
-}
-
-@media (max-height: 760px) {
-  .monument {
-    margin-top: 40px;
-  }
-
-  .action-primary {
-    margin-top: var(--space-2);
-  }
-
-  .dropzone {
-    margin-top: var(--space-2);
-    padding: 20px;
-  }
 }
