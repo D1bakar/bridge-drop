@@ -755,8 +755,23 @@ def _new_code() -> str:
     return f"{secrets.randbelow(900000) + 100000}"
 
 
+def public_base_url(request: Request) -> str:
+    # LAN run: caller reached us via the LAN IP → echo it back (QR must hold
+    # an address the phone can open). Cloud run: echo the public https host.
+    # Falls back to the detected LAN IP when headers are missing (tests).
+    try:
+        host = (request.headers.get("host") or "").strip()
+        scheme = (request.headers.get("x-forwarded-proto")
+                  or request.url.scheme or "http").split(",")[0].strip()
+        if host and scheme in ("http", "https"):
+            return f"{scheme}://{host}"
+    except Exception:
+        pass
+    return f"http://{get_lan_ip()}:8000"
+
+
 @app.post("/v1/pair/code", status_code=201)
-def pair_new_code():
+def pair_new_code(request: Request):
     import time
 
     code = _new_code()
@@ -769,12 +784,12 @@ def pair_new_code():
             (code, token, time.time() + _PAIR_TTL),
         )
         conn.commit()
-    url = f"http://{get_lan_ip()}:8000/?code={code}"
+    url = f"{public_base_url(request)}/?code={code}"
     return {"code": code, "expires_in": int(_PAIR_TTL), "url": url}
 
 
 @app.get("/v1/pair/qr")
-def pair_qr(code: str = ""):
+def pair_qr(request: Request, code: str = ""):
     # Design §6: Warm Obsidian modules on Bone White, quiet zone ≥ 4, square.
     import io
     import time
@@ -796,7 +811,7 @@ def pair_qr(code: str = ""):
         live = row["code"]
     if not live:
         raise HTTPException(status_code=404, detail="no live pair code")
-    url = f"http://{get_lan_ip()}:8000/?code={live}"
+    url = f"{public_base_url(request)}/?code={live}"
     qr = qrcode.QRCode(box_size=10, border=4)
     qr.add_data(url)
     qr.make(fit=True)
