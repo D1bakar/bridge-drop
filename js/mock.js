@@ -55,10 +55,28 @@ function renderDevices(devices = MOCK_DEVICES) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (window.BridgeApi && window.BridgeApi.handoffCode()) return; // guest → pair page
   renderDevices();
   renderRecent();
+  refreshDevicesFromServer();
   refreshRecentFromServer();
 });
+
+async function refreshDevicesFromServer() {
+  // Real paired names when the backend is up; mock row otherwise.
+  try {
+    if (!window.BridgeApi) return;
+    const out = await window.BridgeApi.json('/v1/devices');
+    const info = await window.BridgeApi.json('/v1/info').catch(() => null);
+    const devs = [{ name: (info && info.data.name) || 'My PC', platform: 'Windows', trusted: true }];
+    (out.data.devices || []).forEach((d) => {
+      devs.push({ name: d.name, platform: d.platform || 'Device', trusted: true });
+    });
+    renderDevices(devs);
+  } catch (_) {
+    /* mock stays */
+  }
+}
 
 function apiCandidates() {
   // Single-terminal mode: page served from :8000 → same origin, no guessing.
@@ -115,15 +133,18 @@ function setNetStatus(live, reason) {
   }
 }
 
-async function fetchFilesFrom(base, timeoutMs) {
+async function fetchJsonFrom(base, path, timeoutMs) {
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const res = await fetch(`${base}/v1/files`, { signal: ctrl.signal });
+    const headers = {};
+    try {
+      const tok = localStorage.getItem('bridge-device');
+      if (tok) headers['X-Device-Token'] = tok;
+    } catch (_) {}
+    const res = await fetch(`${base}${path}`, { signal: ctrl.signal, headers });
     if (!res.ok) return { ok: false, reason: `HTTP ${res.status} from ${base}` };
-    const data = await res.json();
-    if (!data.files) return { ok: false, reason: `bad JSON from ${base}` };
-    return { ok: true, base, data };
+    return { ok: true, base, data: await res.json() };
   } catch (e) {
     const why = e && e.name === 'AbortError' ? `timeout ${timeoutMs}ms to ${base}` : `unreachable ${base}`;
     return { ok: false, reason: why };
@@ -132,34 +153,87 @@ async function fetchFilesFrom(base, timeoutMs) {
   }
 }
 
+function actionLink(label) {
+  const a = document.createElement('a');
+  a.className = 'action-secondary';
+  a.href = '#';
+  a.innerHTML = `${label} <span aria-hidden="true">→</span>`;
+  return a;
+}
+
+async function apiDelete(path, base) {
+  const headers = {};
+  try {
+    const tok = localStorage.getItem('bridge-device');
+    if (tok) headers['X-Device-Token'] = tok;
+  } catch (_) {}
+  const res = await fetch(`${base}${path}`, { method: 'DELETE', headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+}
+
+function toast(text) {
+  if (window.BridgeApi) window.BridgeApi.toast(text);
+}
+
 async function refreshRecentFromServer() {
   const reasons = [];
   for (const base of apiCandidates()) {
-    const r = await fetchFilesFrom(base, 2500);
-    if (!r.ok) {
-      reasons.push(r.reason);
+    // Preferred: persistent feed (ids → full delete of row + file, pending states).
+    const feed = await fetchJsonFrom(base, '/v1/feed?kind=file&limit=5', 2500);
+    if (feed.ok && feed.data.items) {
+      setNetStatus(true);
+      if (!feed.data.items.length) {
+        renderRecentEmpty(); // server up, nothing shared yet — no fake mock
+        return true;
+      }
+      renderRecent(feed.data.items.map((f) => {
+        const rel = f.saved_path || f.name;
+        const url = `${base}/v1/files/${rel.split('/').map(encodeURIComponent).join('/')}`;
+        const mime = (f.mime || '').toLowerCase();
+        return {
+          name: f.name,
+          time: fmtTime(f.created_at),
+          meta: fmtSize(f.size || 0),
+          direction: f.direction === 'out' ? 'Out' : 'In',
+          url,
+          thumb: mime.indexOf('image/') === 0 ? url : null,
+          pending: f.status === 'pending',
+          onDelete: async () => {
+            await apiDelete(`/v1/feed/file/${encodeURIComponent(f.id)}?delete_file=1`, base);
+          },
+          acceptId: f.status === 'pending' ? f.id : null,
+          declineId: f.status === 'pending' ? f.id : null,
+        };
+      }), base);
+      return true;
+    }
+    // Fallback: plain file list (older server or feed hiccup).
+    const r = await fetchJsonFrom(base, '/v1/files', 2500);
+    if (!r.ok || !r.data.files) {
+      reasons.push((feed.ok ? r.reason : feed.reason) || 'backend off');
       continue;
     }
-    const data = r.data;
     setNetStatus(true);
-    if (data.files.length === 0) {
-      renderRecentEmpty(); // server up, nothing shared yet — no fake mock
+    if (!r.data.files.length) {
+      renderRecentEmpty();
       return true;
     }
     renderRecent(
-      data.files.slice(0, 5).map((f) => {
-        const url = `${r.base}/v1/files/${encodeURIComponent(f.name)}`;
+      r.data.files.slice(0, 5).map((f) => {
+        const rel = f.path || f.name;
+        const url = `${base}/v1/files/${rel.split('/').map(encodeURIComponent).join('/')}`;
         return {
-          id: f.name,
           name: f.name,
           time: fmtTime(f.mtime),
           meta: fmtSize(f.size),
           direction: 'In',
           url,
           thumb: f.kind === 'image' ? url : null,
+          onDelete: async () => {
+            await apiDelete(`/v1/files/${rel.split('/').map(encodeURIComponent).join('/')}`, base);
+          },
         };
-      })
-    );
+      }), base);
     return true;
   }
   const reason = reasons.join(' · ') || 'backend off';
@@ -193,7 +267,7 @@ function renderRecentEmpty() {
   list.appendChild(li);
 }
 
-function renderRecent(items = MOCK_RECENT) {
+function renderRecent(items = MOCK_RECENT, base = '') {
   const list = document.getElementById('recent-list');
   if (!list) return;
   list.textContent = '';
@@ -232,11 +306,62 @@ function renderRecent(items = MOCK_RECENT) {
     main.appendChild(meta);
 
     const pill = document.createElement('span');
-    pill.className = 'pill';
-    pill.textContent = r.direction;
+    pill.className = 'pill' + (r.pending ? ' pill-attention' : '');
+    pill.textContent = r.pending ? 'Waiting' : r.direction;
 
     li.appendChild(main);
     li.appendChild(pill);
+
+    // Every row you shared or received can go: history row + file, together.
+    if (r.acceptId && base) {
+      const acc = actionLink('Accept');
+      acc.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await apiPost(`/v1/feed/accept/${encodeURIComponent(r.acceptId)}`, base);
+          toast('Received →');
+          refreshRecentFromServer();
+        } catch (_) {
+          toast('Accept failed — try again.');
+        }
+      });
+      const dec = actionLink('Decline');
+      dec.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await apiPost(`/v1/feed/decline/${encodeURIComponent(r.declineId)}`, base);
+          toast('Declined →');
+          refreshRecentFromServer();
+        } catch (_) {
+          toast('Decline failed — try again.');
+        }
+      });
+      li.appendChild(acc);
+      li.appendChild(dec);
+    } else if (r.onDelete && base) {
+      const del = actionLink('Delete');
+      del.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          await r.onDelete();
+          toast('Deleted →');
+          refreshRecentFromServer();
+        } catch (_) {
+          toast('Delete failed — try again.');
+        }
+      });
+      li.appendChild(del);
+    }
     list.appendChild(li);
   });
+}
+
+async function apiPost(path, base) {
+  const headers = {};
+  try {
+    const tok = localStorage.getItem('bridge-device');
+    if (tok) headers['X-Device-Token'] = tok;
+  } catch (_) {}
+  const res = await fetch(`${base}${path}`, { method: 'POST', headers });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }

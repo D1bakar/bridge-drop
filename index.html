@@ -13,20 +13,22 @@
   />
   <link rel="stylesheet" href="css/tokens.css" />
   <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/pages.css" />
 </head>
 <body>
   <header class="top">
     <div class="wordmark">Bridge</div>
     <nav class="topnav" aria-label="Primary">
-      <a href="#home" aria-current="page">Home</a>
-      <a href="#dropzone">Send</a>
-      <a href="#recent">History</a>
-      <a href="#">Settings</a>
+      <a href="/" aria-current="page">Home</a>
+      <a href="send.html">Send</a>
+      <a href="history.html">History</a>
+      <a href="pair.html">Pair</a>
+      <a href="settings.html">Settings</a>
     </nav>
   </header>
   <main id="home">
     <h1 class="monument">Drop<br />here.</h1>
-    <a class="action-primary" href="#dropzone">Send <span aria-hidden="true">→</span></a>
+    <a class="action-primary" href="send.html">Send <span aria-hidden="true">→</span></a>
 
     <!-- .is-dragover toggled by js/dropzone.js; picker wired by js/upload.js -->
     <section class="dropzone" id="dropzone" aria-label="Drop files">
@@ -45,14 +47,19 @@
           </div>
           <span class="pill">Paired</span>
         </li>
-        <li class="device">
-          <div class="device-main">
-            <span class="device-meta">Android · LAN</span>
-            <span class="device-name">My Phone</span>
-          </div>
-          <span class="pill">Paired</span>
-        </li>
       </ul>
+      <a class="action-secondary" href="pair.html">Pair a phone <span aria-hidden="true">→</span></a>
+    </section>
+
+    <section aria-label="Share text">
+      <span class="pill">Text</span>
+      <form class="snippet-form">
+        <label class="field-label" for="snippet-input">Paste text or a link</label>
+        <textarea class="field-area" id="snippet-input" rows="2"></textarea>
+        <span class="field-error"></span>
+        <br />
+        <button class="action-secondary" type="submit" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:inherit;">Share text <span aria-hidden="true">→</span></button>
+      </form>
     </section>
 
     <section class="recent" id="recent" aria-label="Recent transfers">
@@ -74,10 +81,13 @@
           <span class="pill">Out</span>
         </li>
       </ul>
+      <a class="action-secondary" href="history.html">View all <span aria-hidden="true">→</span></a>
     </section>
   </main>
+  <script src="js/api.js"></script>
   <script src="js/mock.js"></script>
   <script src="js/dropzone.js"></script>
   <script src="js/upload.js"></script>
+  <script src="js/feed.js"></script>
 </body>
 </html>
