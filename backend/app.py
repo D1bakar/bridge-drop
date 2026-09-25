@@ -334,6 +334,8 @@ def info():
         "version": app_version(),
         "capabilities": ["info", "files", "snippets", "chunked", "pair"],
         "trusted": True,
+        # Pair hint (prd §11): phone browser must open this exact URL.
+        "lan_url": f"http://{get_lan_ip()}:8000/",
     }
 
 
