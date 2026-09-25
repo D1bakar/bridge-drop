@@ -88,3 +88,4 @@ function initUpload() {
 document.addEventListener("DOMContentLoaded", initUpload);
 
 window.BridgeUpload = { API_BASE, uploadFile };
+window.BridgeSpin = setLoading;
