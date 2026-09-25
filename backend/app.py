@@ -73,12 +73,32 @@ WEB_ROOT = Path(__file__).parent.parent
 try:
     from fastapi.staticfiles import StaticFiles
 
-    for _dirname in ("css", "js"):
+    for _dirname in ("css", "js", "icons"):
         _d = WEB_ROOT / _dirname
         if _d.is_dir():
             app.mount(f"/{_dirname}", StaticFiles(directory=str(_d)), name=_dirname)
 except Exception:
     pass
+
+
+@app.get("/manifest.webmanifest")
+def manifest():
+    from fastapi.responses import FileResponse
+
+    target = WEB_ROOT / "manifest.webmanifest"
+    if not target.is_file():
+        raise HTTPException(status_code=404, detail="not found")
+    return FileResponse(path=str(target), media_type="application/manifest+json")
+
+
+@app.get("/sw.js")
+def service_worker():
+    from fastapi.responses import FileResponse
+
+    target = WEB_ROOT / "sw.js"
+    if not target.is_file():
+        raise HTTPException(status_code=404, detail="not found")
+    return FileResponse(path=str(target), media_type="application/javascript")
 
 
 _RESERVED = {
