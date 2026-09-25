@@ -20,6 +20,9 @@ Double-click **`start-bridge.bat`**, or from `backend/`:
 python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
 ```
 
+No git? Grab `bridge-<version>.zip` from GitHub Releases, unzip anywhere,
+double-click `start-bridge.bat` (needs Python 3.12+ once). Same app, same flow.
+
 Startup prints `PC: http://127.0.0.1:8000/` + `Phone (same Wi-Fi): http://<LAN-IP>:8000/`.
 Open the first on the PC, the second on the phone (same Wi-Fi). Keep the window open.
 

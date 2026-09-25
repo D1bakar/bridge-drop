@@ -331,10 +331,21 @@ def info():
         "id": "pc-1",
         "name": db.get_setting("device_name", "My PC") or "My PC",
         "platform": "Windows",
-        "version": "0.1.0",
+        "version": app_version(),
         "capabilities": ["info", "files", "snippets", "chunked", "pair"],
         "trusted": True,
     }
+
+
+def app_version() -> str:
+    # Single source of truth for releases: root VERSION file, baked into zips.
+    try:
+        v = (WEB_ROOT / "VERSION").read_text(encoding="utf-8").strip()
+        if v:
+            return v
+    except OSError:
+        pass
+    return "0.1.0"
 
 
 @app.post("/v1/files", status_code=201)
