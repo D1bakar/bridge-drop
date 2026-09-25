@@ -300,9 +300,10 @@ def info():
 
 
 @app.post("/v1/files", status_code=201)
-async def upload_file(file: UploadFile = File(...), relPath: str = ""):
+async def upload_file(request: Request, file: UploadFile = File(...), relPath: str = ""):
     # PRD §7 reliability: stream to .part, rename on success — no partials in destination.
     # Save rules (FR-16) + folder structure (FR-9) apply here too.
+    peer_id, _known = resolve_peer(request)
     raw_name = file.filename or "file"
     safe_name = sanitize_filename(raw_name.rpartition("/")[2].rpartition("\\")[2])
     root = save_root_for(safe_name, relPath or "")
@@ -337,7 +338,7 @@ async def upload_file(file: UploadFile = File(...), relPath: str = ""):
         saved_rel = target.relative_to(UPLOAD_ROOT).as_posix()
     except ValueError:
         saved_rel = target.name
-    tid = record_transfer("local", "in", "file", target.name, size, mime,
+    tid = record_transfer(peer_id, "in", "file", target.name, size, mime,
                           digest.hexdigest(), "done", saved_rel)
     return {"name": target.name, "size": size, "sha256": digest.hexdigest(),
             "id": tid, "path": saved_rel}
@@ -457,7 +458,7 @@ def _snippet_kind(body: str, hint: str) -> str:
 
 
 @app.post("/v1/snippets", status_code=201)
-def post_snippet(payload: dict):
+def post_snippet(payload: dict, request: Request):
     # Text / links / clipboard pushes (PRD FR-10, FR-26). Stored, feed-listed.
     body = str(payload.get("body", "") or "")
     if not body.strip():
@@ -465,12 +466,13 @@ def post_snippet(payload: dict):
     if len(body) > 100_000:
         raise HTTPException(status_code=413, detail="snippet too large")
     kind = _snippet_kind(body, str(payload.get("kind", "") or ""))
+    peer_id, _known = resolve_peer(request)
     sid = uuid.uuid4().hex[:12]
     with db.connect() as conn:
         conn.execute(
             "INSERT INTO snippets(id, peer_id, direction, kind, body, created_at)"
             " VALUES(?,?,?,?,?,?)",
-            (sid, "local", "in", kind, body, db.now()),
+            (sid, peer_id, "in", kind, body, db.now()),
         )
         conn.commit()
     return {"id": sid, "kind": kind}
@@ -515,7 +517,8 @@ def _get_upload(uid: str) -> dict:
 
 
 @app.post("/v1/uploads/init", status_code=201)
-def uploads_init(payload: dict):
+def uploads_init(payload: dict, request: Request):
+    peer_id, _known = resolve_peer(request)
     name = sanitize_filename(str(payload.get("name", "") or ""))
     if not name or name == "file" and not payload.get("name"):
         raise HTTPException(status_code=422, detail="name required")
@@ -548,7 +551,7 @@ def uploads_init(payload: dict):
             "INSERT INTO chunked(id, peer_id, name, rel_path, save_dir, size, mime,"
             " sha256_expected, bytes_done, tmp_name, final_name, status, created_at)"
             " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
-            (uid, "local", name, rel, save_dir, size, mime, sha_exp.lower(),
+            (uid, peer_id, name, rel, save_dir, size, mime, sha_exp.lower(),
              0, tmp.name, "", "uploading", db.now()),
         )
         conn.commit()
@@ -592,6 +595,10 @@ async def upload_chunk(uid: str, request: Request, offset: int = 0):
 
 @app.post("/v1/uploads/{uid}/complete")
 def upload_complete(uid: str, payload: dict | None = None):
+    return _finalize_upload(uid, payload, force=False)
+
+
+def _finalize_upload(uid: str, payload: dict | None, force: bool):
     u = _get_upload(uid)
     if u["status"] != "uploading":
         raise HTTPException(status_code=409, detail=f"upload {u['status']}")
@@ -614,6 +621,14 @@ def upload_complete(uid: str, payload: dict | None = None):
     got = digest.hexdigest()
     if want and want != got:
         raise HTTPException(status_code=422, detail="hash mismatch — re-send the file")
+    if u["peer_id"].startswith("guest:") and not _auto_accept() and not force:
+        # FR-13: unknown sender waits for an explicit Accept in the UI.
+        with db.connect() as conn:
+            conn.execute("UPDATE chunked SET status='pending' WHERE id=?", (uid,))
+            conn.commit()
+        tid = record_transfer(u["peer_id"], "in", "file", u["name"], u["size"],
+                              u["mime"], got, "pending", "")
+        return {"pending": True, "id": tid, "name": u["name"], "size": u["size"]}
     root = UPLOAD_ROOT
     if u["save_dir"]:
         root = root / Path(*u["save_dir"].split("/"))
@@ -627,7 +642,7 @@ def upload_complete(uid: str, payload: dict | None = None):
         saved_rel = target.relative_to(UPLOAD_ROOT).as_posix()
     except ValueError:
         saved_rel = target.name
-    tid = record_transfer("local", "in", "file", target.name, u["size"],
+    tid = record_transfer(u["peer_id"], "in", "file", target.name, u["size"],
                           u["mime"] or mimetypes.guess_type(target.name)[0] or "",
                           got, "done", saved_rel)
     with db.connect() as conn:
@@ -651,3 +666,155 @@ def upload_cancel(uid: str):
         conn.execute("UPDATE chunked SET status='cancelled' WHERE id=?", (uid,))
         conn.commit()
     return {"ok": True}
+
+
+# --- Pairing: one-time codes + QR + trusted devices (PRD FR-2/FR-3/FR-13) ---
+# PC shows QR → phone scans → opens URL with ?code= → claims → trusted device.
+# Codes expire in 5 min, single use. Unknown senders without a live code get
+# nothing; with auto-accept OFF, guest uploads wait in "pending" for Accept.
+
+_PAIR_TTL = 300.0
+
+
+def _new_code() -> str:
+    import secrets
+
+    return f"{secrets.randbelow(900000) + 100000}"
+
+
+@app.post("/v1/pair/code", status_code=201)
+def pair_new_code():
+    import time
+
+    code = _new_code()
+    token = uuid.uuid4().hex
+    with db.connect() as conn:
+        # one live code at a time keeps the UX unambiguous
+        conn.execute("DELETE FROM pair_codes")
+        conn.execute(
+            "INSERT INTO pair_codes(code, token, expires_at, used) VALUES(?,?,?,0)",
+            (code, token, time.time() + _PAIR_TTL),
+        )
+        conn.commit()
+    url = f"http://{get_lan_ip()}:8000/?code={code}"
+    return {"code": code, "expires_in": int(_PAIR_TTL), "url": url}
+
+
+@app.get("/v1/pair/qr")
+def pair_qr(code: str = ""):
+    # Design §6: Warm Obsidian modules on Bone White, quiet zone ≥ 4, square.
+    import io
+    import time
+
+    import qrcode
+
+    with db.connect() as conn:
+        row = conn.execute(
+            "SELECT code, expires_at, used FROM pair_codes ORDER BY expires_at DESC LIMIT 1"
+        ).fetchone()
+    live = None
+    if code:
+        with db.connect() as conn:
+            r = conn.execute("SELECT code, expires_at, used FROM pair_codes WHERE code=?",
+                             (code,)).fetchone()
+            if r and not r["used"] and r["expires_at"] > time.time():
+                live = r["code"]
+    elif row and not row["used"] and row["expires_at"] > time.time():
+        live = row["code"]
+    if not live:
+        raise HTTPException(status_code=404, detail="no live pair code")
+    url = f"http://{get_lan_ip()}:8000/?code={live}"
+    qr = qrcode.QRCode(box_size=10, border=4)
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="#262523", back_color="#ececec")
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    from fastapi.responses import Response
+
+    return Response(content=buf.getvalue(), media_type="image/png")
+
+
+@app.post("/v1/pair/claim", status_code=201)
+def pair_claim(payload: dict, request: Request):
+    import time
+
+    ip = _client_ip(request)
+    if _fail_count(ip) >= _FAIL_MAX:
+        raise HTTPException(status_code=429, detail="too many attempts — wait a while")
+    code = str(payload.get("code", "") or "").strip()
+    name = str(payload.get("name", "") or "Guest phone")[:60] or "Guest phone"
+    platform = str(payload.get("platform", "") or "Browser")[:30] or "Browser"
+    with db.connect() as conn:
+        row = conn.execute("SELECT code, token, expires_at, used FROM pair_codes WHERE code=?",
+                           (code,)).fetchone()
+        if not row or row["used"] or row["expires_at"] <= time.time():
+            _note_fail(ip)
+            raise HTTPException(status_code=403, detail="bad or expired code")
+        did = uuid.uuid4().hex[:12]
+        fingerprint = uuid.uuid4().hex[:8]  # short code shown on both ends (FR-2)
+        conn.execute(
+            "INSERT INTO devices(id, name, platform, fingerprint, trusted, token,"
+            " created_at, last_seen, last_address) VALUES(?,?,?,?,?,?,?,?,?)",
+            (did, name, platform, fingerprint, 1, row["token"], db.now(), db.now(), ip),
+        )
+        conn.execute("UPDATE pair_codes SET used=1 WHERE code=?", (code,))
+        conn.commit()
+    return {"deviceId": did, "deviceToken": row["token"], "fingerprint": fingerprint}
+
+
+@app.get("/v1/devices")
+def list_devices():
+    with db.connect() as conn:
+        rows = conn.execute(
+            "SELECT id, name, platform, fingerprint, trusted, created_at, last_seen"
+            " FROM devices ORDER BY created_at").fetchall()
+    return {"devices": db.dicts(rows)}
+
+
+@app.patch("/v1/devices/{did}")
+def rename_device(did: str, payload: dict):
+    name = str(payload.get("name", "") or "").strip()[:60]
+    if not name:
+        raise HTTPException(status_code=422, detail="name required")
+    with db.connect() as conn:
+        row = conn.execute("SELECT id FROM devices WHERE id=?", (did,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="not found")
+        conn.execute("UPDATE devices SET name=? WHERE id=?", (name, did))
+        conn.commit()
+    return {"ok": True, "name": name}
+
+
+@app.delete("/v1/devices/{did}")
+def revoke_device(did: str):
+    # Revoke: token dies with the row; that phone must re-pair (PRD §10).
+    with db.connect() as conn:
+        row = conn.execute("SELECT id FROM devices WHERE id=?", (did,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="not found")
+        conn.execute("DELETE FROM devices WHERE id=?", (did,))
+        conn.commit()
+    return {"ok": True}
+
+
+@app.post("/v1/uploads/{uid}/accept")
+def upload_accept(uid: str):
+    # FR-13: unknown-sender uploads wait here when auto-accept is OFF.
+    u = _get_upload(uid)
+    if u["status"] != "pending":
+        raise HTTPException(status_code=409, detail=f"upload {u['status']}")
+    with db.connect() as conn:
+        conn.execute("UPDATE chunked SET status='uploading' WHERE id=?", (uid,))
+        conn.commit()
+    # Reuse the finalize path (hash check + rename + history).
+    return _finalize_upload(uid, None, force=True)
+
+
+@app.post("/v1/uploads/{uid}/decline")
+def upload_decline(uid: str):
+    u = _get_upload(uid)
+    if u["status"] != "pending":
+        raise HTTPException(status_code=409, detail=f"upload {u['status']}")
+    upload_cancel(uid)
+    return {"ok": True, "declined": True}
