@@ -8,11 +8,16 @@ Contract (frontend untouched, still on mock.js):
 """
 
 from pathlib import Path
+import hashlib
+import mimetypes
 import socket
+import uuid
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+
+import db
 
 
 def get_lan_ip() -> str:
@@ -82,6 +87,86 @@ _RESERVED = {
     *(f"lpt{i}" for i in range(1, 10)),
 }
 
+# Unknown-sender rate limit (PRD §10): per-IP failed-auth timestamps.
+_FAILS: dict[str, list[float]] = {}
+_FAIL_WINDOW = 600.0
+_FAIL_MAX = 20
+
+
+def _client_ip(request) -> str:
+    try:
+        return request.client.host if request.client else "unknown"
+    except Exception:
+        return "unknown"
+
+
+def _note_fail(ip: str) -> None:
+    import time
+
+    now = time.time()
+    lst = [t for t in _FAILS.get(ip, []) if now - t < _FAIL_WINDOW]
+    lst.append(now)
+    _FAILS[ip] = lst
+
+
+def _fail_count(ip: str) -> int:
+    import time
+
+    now = time.time()
+    return sum(1 for t in _FAILS.get(ip, []) if now - t < _FAIL_WINDOW)
+
+
+def resolve_peer(request, db_conn=None) -> tuple[str, bool]:
+    """Return (peer_id, known). Known = paired device token or live pair code.
+
+    Credentials: X-Device-Token header (paired) or ?code=/X-Bridge-Code (guest).
+    """
+    import time
+
+    token = request.headers.get("x-device-token", "") if hasattr(request, "headers") else ""
+    code = ""
+    try:
+        code = request.query_params.get("code", "") or request.headers.get("x-bridge-code", "")
+    except Exception:
+        code = ""
+    close = False
+    conn = db_conn or db.connect()
+    close = db_conn is None
+    try:
+        if token:
+            row = conn.execute(
+                "SELECT id FROM devices WHERE token=? AND trusted=1", (token,)
+            ).fetchone()
+            if row:
+                return row["id"], True
+        if code:
+            row = conn.execute(
+                "SELECT code, expires_at, used FROM pair_codes WHERE code=?", (code,)
+            ).fetchone()
+            if row and not row["used"] and row["expires_at"] > time.time():
+                return f"guest:{code}", True
+        return "local", True  # same-machine / open LAN (M0); auto-accept gate applies
+    finally:
+        if close:
+            conn.close()
+
+
+def _auto_accept() -> bool:
+    return db.get_setting("auto_accept", "1") == "1"
+
+
+def record_transfer(peer_id, direction, kind, name, size, mime, sha256, status, saved_path):
+    tid = uuid.uuid4().hex[:12]
+    with db.connect() as conn:
+        conn.execute(
+            "INSERT INTO transfers(id, peer_id, direction, kind, name, size, mime,"
+            " sha256, status, saved_path, created_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
+            (tid, peer_id, direction, kind, name, size, mime, sha256, status,
+             saved_path, db.now()),
+        )
+        conn.commit()
+    return tid
+
 
 def sanitize_filename(name: str) -> str:
     # PRD §10: never write outside save root, handle .., reserved names, controls.
@@ -149,6 +234,7 @@ async def upload_file(file: UploadFile = File(...)):
     target = unique_path(file.filename or "file")
     part = target.with_name(target.name + ".part")
     size = 0
+    digest = hashlib.sha256()
     try:
         with part.open("wb") as out:
             while True:
@@ -156,6 +242,7 @@ async def upload_file(file: UploadFile = File(...)):
                 if not chunk:
                     break
                 size += len(chunk)
+                digest.update(chunk)
                 out.write(chunk)
         part.replace(target)
     except Exception as exc:
@@ -170,7 +257,10 @@ async def upload_file(file: UploadFile = File(...)):
             await file.close()
         except Exception:
             pass
-    return {"name": target.name, "size": size}
+    mime = mimetypes.guess_type(target.name)[0] or ""
+    tid = record_transfer("local", "in", "file", target.name, size, mime,
+                          digest.hexdigest(), "done", target.name)
+    return {"name": target.name, "size": size, "sha256": digest.hexdigest(), "id": tid}
 
 
 @app.get("/v1/files")
@@ -197,6 +287,56 @@ def list_files():
         )
     items.sort(key=lambda r: r["mtime"], reverse=True)
     return {"files": items}
+
+
+@app.get("/v1/feed")
+def feed(q: str = "", kind: str = "", limit: int = 100):
+    # Persistent chronological feed (PRD FR-23): files + snippets, newest first.
+    # Search (FR-24): ?q= matches filename or snippet body. ?kind=file|snippet.
+    limit = max(1, min(limit, 500))
+    like = f"%{q}%" if q else "%"
+    items = []
+    with db.connect() as conn:
+        if kind in ("", "file"):
+            for r in conn.execute(
+                "SELECT id, peer_id, direction, name, size, mime, sha256, status,"
+                " saved_path, created_at FROM transfers"
+                " WHERE (? = '%' OR name LIKE ?) ORDER BY created_at DESC LIMIT ?",
+                (like, like, limit),
+            ):
+                d = dict(r)
+                d["type"] = "file"
+                items.append(d)
+        if kind in ("", "snippet"):
+            for r in conn.execute(
+                "SELECT id, peer_id, direction, kind, body, created_at FROM snippets"
+                " WHERE (? = '%' OR body LIKE ?) ORDER BY created_at DESC LIMIT ?",
+                (like, like, limit),
+            ):
+                d = dict(r)
+                d["type"] = "snippet"
+                items.append(d)
+    items.sort(key=lambda r: r["created_at"], reverse=True)
+    return {"items": items[:limit]}
+
+
+@app.delete("/v1/feed/file/{tid}")
+def delete_transfer(tid: str, delete_file: bool = False):
+    # Delete history row; optionally remove the file from disk too.
+    with db.connect() as conn:
+        row = conn.execute("SELECT saved_path FROM transfers WHERE id=?", (tid,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="not found")
+        conn.execute("DELETE FROM transfers WHERE id=?", (tid,))
+        conn.commit()
+    if delete_file and row["saved_path"]:
+        try:
+            p = (UPLOAD_ROOT / Path(row["saved_path"]).name).resolve()
+            if UPLOAD_ROOT.resolve() in p.parents and p.is_file():
+                p.unlink()
+        except OSError:
+            pass
+    return {"ok": True}
 
 
 @app.get("/v1/files/{name}")
