@@ -33,6 +33,14 @@ def get_lan_ip() -> str:
 async def lifespan(app: FastAPI):
     # M0 gate (prd §4): print what the phone browser must open.
     # --host 0.0.0.0 required; localhost alone is unreachable from the phone.
+    import db
+
+    db.init_db()
+    # Defaults for a fresh install (PRD FR-30). Never overwrite user choices.
+    if not db.get_setting("device_name"):
+        db.set_setting("device_name", "My PC")
+    if not db.get_setting("auto_accept"):
+        db.set_setting("auto_accept", "1")
     ip = get_lan_ip()
     print("Bridge M0 up — PC:   http://127.0.0.1:8000/", flush=True)
     print(f"Bridge M0 up — Phone (same Wi-Fi): http://{ip}:8000/", flush=True)
