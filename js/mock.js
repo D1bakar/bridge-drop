@@ -147,7 +147,8 @@ async function refreshRecentFromServer() {
       return true;
     }
     renderRecent(
-      data.files.slice(0, 5).map((f) => {
+      // Home preview capped at 3 for compact fit; history.html shows the full feed.
+      data.files.slice(0, 3).map((f) => {
         const url = `${r.base}/v1/files/${encodeURIComponent(f.name)}`;
         return {
           id: f.name,
