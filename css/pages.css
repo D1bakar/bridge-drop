@@ -222,3 +222,33 @@ main {
     animation: none;
   }
 }
+
+/* Compact mobile density for sub-pages — same rules as home: natural scroll,
+ * tighter rhythm, desktop unchanged. */
+@media (max-width: 719px) {
+  .page-heading {
+    font-size: clamp(40px, 13vw, 64px);
+    margin-top: 48px;
+  }
+
+  .transfer-pct {
+    font-size: 32px;
+  }
+
+  .pair-block {
+    display: block;
+    padding: 20px;
+  }
+
+  .pair-qr {
+    width: min(240px, 100%);
+  }
+
+  .pair-code {
+    font-size: 32px;
+  }
+
+  .pending {
+    padding: 20px;
+  }
+}
