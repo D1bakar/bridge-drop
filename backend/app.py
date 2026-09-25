@@ -351,3 +351,56 @@ def download_file(name: str):
     from fastapi.responses import FileResponse
 
     return FileResponse(path=str(target), filename=target.name)
+
+
+def _snippet_kind(body: str, hint: str) -> str:
+    hint = (hint or "").lower()
+    if hint in ("text", "link", "clipboard"):
+        return hint
+    s = body.strip().lower()
+    if s.startswith(("http://", "https://")) and " " not in s and len(s) < 4096:
+        return "link"
+    return "text"
+
+
+@app.post("/v1/snippets", status_code=201)
+def post_snippet(payload: dict):
+    # Text / links / clipboard pushes (PRD FR-10, FR-26). Stored, feed-listed.
+    body = str(payload.get("body", "") or "")
+    if not body.strip():
+        raise HTTPException(status_code=422, detail="empty snippet")
+    if len(body) > 100_000:
+        raise HTTPException(status_code=413, detail="snippet too large")
+    kind = _snippet_kind(body, str(payload.get("kind", "") or ""))
+    sid = uuid.uuid4().hex[:12]
+    with db.connect() as conn:
+        conn.execute(
+            "INSERT INTO snippets(id, peer_id, direction, kind, body, created_at)"
+            " VALUES(?,?,?,?,?,?)",
+            (sid, "local", "in", kind, body, db.now()),
+        )
+        conn.commit()
+    return {"id": sid, "kind": kind}
+
+
+@app.get("/v1/snippets")
+def list_snippets(limit: int = 100):
+    limit = max(1, min(limit, 500))
+    with db.connect() as conn:
+        rows = conn.execute(
+            "SELECT id, peer_id, direction, kind, body, created_at FROM snippets"
+            " ORDER BY created_at DESC LIMIT ?",
+            (limit,),
+        ).fetchall()
+    return {"snippets": db.dicts(rows)}
+
+
+@app.delete("/v1/feed/snippet/{sid}")
+def delete_snippet(sid: str):
+    with db.connect() as conn:
+        row = conn.execute("SELECT id FROM snippets WHERE id=?", (sid,)).fetchone()
+        if not row:
+            raise HTTPException(status_code=404, detail="not found")
+        conn.execute("DELETE FROM snippets WHERE id=?", (sid,))
+        conn.commit()
+    return {"ok": True}
