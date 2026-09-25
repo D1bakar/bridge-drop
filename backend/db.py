@@ -57,6 +57,21 @@ CREATE TABLE IF NOT EXISTS settings (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL DEFAULT ''
 );
+CREATE TABLE IF NOT EXISTS chunked (
+    id TEXT PRIMARY KEY,
+    peer_id TEXT NOT NULL DEFAULT 'local',
+    name TEXT NOT NULL,
+    rel_path TEXT NOT NULL DEFAULT '',
+    save_dir TEXT NOT NULL DEFAULT '',
+    size INTEGER NOT NULL DEFAULT 0,
+    mime TEXT NOT NULL DEFAULT '',
+    sha256_expected TEXT NOT NULL DEFAULT '',
+    bytes_done INTEGER NOT NULL DEFAULT 0,
+    tmp_name TEXT NOT NULL DEFAULT '',
+    final_name TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL DEFAULT 'uploading',
+    created_at REAL NOT NULL
+);
 """
 
 
