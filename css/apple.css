@@ -42,3 +42,50 @@ body {
   outline: 2px solid var(--color-ink);
   outline-offset: 4px;
 }
+
+/* Bottom tab bar — phone only (max-width: 719px). Desktop keeps top text-nav.
+ * Monochrome: Canvas fill, Ash top hairline, weight carries active state. */
+.tabbar {
+  display: none;
+}
+
+@media (max-width: 719px) {
+  main {
+    padding-bottom: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .tabbar {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 50;
+    background: var(--color-canvas);
+    border-top: 1px solid var(--color-ash);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .tabbar a {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    font-size: 12px;
+    font-weight: var(--weight-medium);
+    letter-spacing: -0.02em;
+    color: var(--color-ink);
+    opacity: 0.6;
+    text-decoration: none;
+  }
+
+  .tabbar a[aria-current="page"] {
+    opacity: 1;
+    font-weight: 700;
+  }
+
+  .tabbar a:active {
+    opacity: var(--opacity-pressed);
+  }
+}
