@@ -61,8 +61,18 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function apiCandidates() {
-  // Live Server can be localhost / 127.0.0.1 / LAN-IP — backend is :8000 on same host.
+  // Single-terminal mode: page served from :8000 → same origin, no guessing.
+  // Live Server mode (:5500 / file://): backend is :8000 on same host.
   // localhost → ::1 often misses a 127.0.0.1-only uvicorn, so try IPv4 first.
+  try {
+    const port = window.location.port;
+    if (port === "8000" && window.location.origin && window.location.origin.startsWith("http")) {
+      const origin = window.location.origin.replace(/\/$/, "");
+      return [origin, "http://127.0.0.1:8000", "http://localhost:8000"].filter(
+        (v, i, a) => a.indexOf(v) === i
+      );
+    }
+  } catch (_) {}
   const raw = (window.location.hostname || "localhost").toLowerCase();
   const host = raw === "localhost" ? "127.0.0.1" : raw;
   const list = [`http://${host}:8000`];

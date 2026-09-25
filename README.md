@@ -22,21 +22,19 @@ M0 prototype (in progress): Python + plain HTML/CSS/JS web-mode. See `prd.md` fo
 
 Backend contract (do not touch from frontend): `GET /v1/info`, `POST /v1/session` per `prd.md` §9.
 
-## Run (M0 LAN — phone browser to PC)
+## Run (M0 — one terminal, no Live Server needed)
 
-Terminal 1 — backend (from `backend/`):
+From `backend/`:
 
 ```powershell
 python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Startup prints `PC: http://127.0.0.1:8000/v1/info` + `Phone (same Wi-Fi): http://<LAN-IP>:8000/v1/info`.
+Startup prints `PC: http://127.0.0.1:8000/` + `Phone (same Wi-Fi): http://<LAN-IP>:8000/`.
 
-Terminal 2 — frontend:
+Open that URL on PC and on the phone (same Wi-Fi) → Choose files → file lands in `backend/uploads/` → Recent feed shows it with `Live` pill. Same origin, so no CORS/host guessing.
 
-Open `index.html` via VS Code Live Server (port 5500). No build step.
-
-Phone test (same Wi-Fi): open `http://<LAN-IP>:5500` → Choose files → file lands in `backend/uploads/` → Recent feed shows it with `Live` pill.
+Alt (dev): open `index.html` via VS Code Live Server (`:5500`) — page still talks to `:8000` via fallback candidates.
 
 Windows note: if the phone can't reach the PC, set Wi-Fi to Private (Settings → Network) and allow Python on the firewall prompt. Public profile blocks inbound (prd §11).
 

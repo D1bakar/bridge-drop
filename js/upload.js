@@ -1,12 +1,20 @@
 /* M0 upload — drop file → POST /v1/files with progress label.
  * Design: label swaps to heading-sm on dragover (CSS); text updates only.
  * Backend down → "Backend off — is :8000 running?" Mock list untouched (c4 refreshes it).
+ * Single-terminal mode (:8000) uses same origin; Live Server mode uses :8000 on same host.
  */
 
-const RAW_HOST = window.location.hostname || "localhost";
-// localhost can resolve to ::1 while uvicorn binds 127.0.0.1 — prefer IPv4.
-const API_HOST = RAW_HOST === "localhost" ? "127.0.0.1" : RAW_HOST;
-const API_BASE = `http://${API_HOST}:8000`;
+const API_BASE = (() => {
+  try {
+    if (window.location.port === "8000" && window.location.origin.startsWith("http")) {
+      return window.location.origin.replace(/\/$/, "");
+    }
+  } catch (_) {}
+  const raw = window.location.hostname || "localhost";
+  // localhost can resolve to ::1 while uvicorn binds 127.0.0.1 — prefer IPv4.
+  const host = raw === "localhost" ? "127.0.0.1" : raw;
+  return `http://${host}:8000`;
+})();
 
 function setDropLabel(text) {
   const label = document.querySelector("#dropzone .dropzone-label");

@@ -1,6 +1,8 @@
 """Bridge M0 backend skeleton — PRD §9 contract starts here.
 
-Run: uvicorn app:app --reload --host 0.0.0.0 --port 8000  (from backend/)
+Run (single terminal, from backend/):
+  python -m uvicorn app:app --reload --host 0.0.0.0 --port 8000
+  open http://127.0.0.1:8000/ on PC, http://<LAN-IP>:8000/ on phone (same Wi-Fi).
 Contract (frontend untouched, still on mock.js):
   GET /v1/info — device info + capabilities
 """
@@ -32,8 +34,8 @@ async def lifespan(app: FastAPI):
     # M0 gate (prd §4): print what the phone browser must open.
     # --host 0.0.0.0 required; localhost alone is unreachable from the phone.
     ip = get_lan_ip()
-    print("Bridge M0 up — PC:   http://127.0.0.1:8000/v1/info", flush=True)
-    print(f"Bridge M0 up — Phone (same Wi-Fi): http://{ip}:8000/v1/info", flush=True)
+    print("Bridge M0 up — PC:   http://127.0.0.1:8000/", flush=True)
+    print(f"Bridge M0 up — Phone (same Wi-Fi): http://{ip}:8000/", flush=True)
     yield
 
 
@@ -50,6 +52,20 @@ app.add_middleware(
 
 UPLOAD_ROOT = Path(__file__).parent / "uploads"
 UPLOAD_ROOT.mkdir(exist_ok=True)
+
+# Single-terminal M0: serve the web-mode UI from the backend so the phone
+# opens one URL (no Live Server, no CORS, no host guessing). PRD §4 M0.
+WEB_ROOT = Path(__file__).parent.parent
+
+try:
+    from fastapi.staticfiles import StaticFiles
+
+    for _dirname in ("css", "js"):
+        _d = WEB_ROOT / _dirname
+        if _d.is_dir():
+            app.mount(f"/{_dirname}", StaticFiles(directory=str(_d)), name=_dirname)
+except Exception:
+    pass
 
 
 _RESERVED = {
@@ -97,6 +113,12 @@ def unique_path(name: str) -> Path:
 
 @app.get("/")
 def root():
+    # Web-mode UI. API health stays at GET /v1/info (no auth yet, M0 LAN only).
+    from fastapi.responses import FileResponse
+
+    index = WEB_ROOT / "index.html"
+    if index.is_file():
+        return FileResponse(path=str(index), media_type="text/html")
     return {"ok": True, "service": "bridge-m0"}
 
 
