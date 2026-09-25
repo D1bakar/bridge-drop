@@ -92,4 +92,11 @@ body {
   .tabbar a:active {
     opacity: var(--opacity-pressed);
   }
+
+  /* No-blur phones: solid Canvas keeps labels readable, shape unchanged. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .tabbar {
+      background: var(--color-canvas);
+    }
+  }
 }
