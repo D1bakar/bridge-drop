@@ -54,16 +54,25 @@ body {
     padding-bottom: calc(76px + env(safe-area-inset-bottom));
   }
 
+  /* One nav only: tab bar owns phone navigation, top links hide. */
+  .topnav {
+    display: none;
+  }
+
   .tabbar {
     display: flex;
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: 16px;
+    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom));
     z-index: 50;
-    background: var(--color-canvas);
-    border-top: 1px solid var(--color-ash);
-    padding-bottom: env(safe-area-inset-bottom);
+    /* Liquid Glass, monochrome: frosted Canvas, Ash edge, Ink text. */
+    background: rgba(236, 236, 236, 0.72);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    backdrop-filter: blur(20px) saturate(1.5);
+    border: 1px solid var(--color-ash);
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(38, 37, 35, 0.12);
   }
 
   .tabbar a {
@@ -87,5 +96,12 @@ body {
 
   .tabbar a:active {
     opacity: var(--opacity-pressed);
+  }
+
+  /* No-blur phones: solid Canvas keeps labels readable, shape unchanged. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .tabbar {
+      background: var(--color-canvas);
+    }
   }
 }

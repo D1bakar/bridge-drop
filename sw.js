@@ -2,7 +2,7 @@
  * API (/v1/*) is always network-only: transfers must never serve stale bytes.
  * Bump CACHE when the shell changes.
  */
-const CACHE = 'bridge-v1';
+const CACHE = 'bridge-v2';
 const SHELL = [
   '/',
   '/send.html',
@@ -13,6 +13,7 @@ const SHELL = [
   '/css/tokens.css',
   '/css/home.css',
   '/css/pages.css',
+  '/css/apple.css',
   '/js/api.js',
   '/js/mock.js',
   '/js/dropzone.js',
