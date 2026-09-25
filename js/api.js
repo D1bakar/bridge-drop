@@ -91,6 +91,7 @@
     if (old) old.remove();
     var el = document.createElement('div');
     el.className = 'toast';
+    el.setAttribute('role', 'status');
     el.textContent = text;
     document.body.appendChild(el);
     setTimeout(function () {
