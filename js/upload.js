@@ -21,6 +21,12 @@ function setDropLabel(text) {
   if (label) label.textContent = text;
 }
 
+function setLoading(on) {
+  // Monument star spins while bytes move; null-safe off Home.
+  const glyph = document.querySelector(".glyph");
+  if (glyph) glyph.classList.toggle("is-loading", !!on);
+}
+
 function uploadFile(file) {
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
@@ -33,6 +39,7 @@ function uploadFile(file) {
       }
     });
     xhr.addEventListener("load", () => {
+      setLoading(false);
       if (xhr.status === 201) {
         setDropLabel("Received →");
         resolve(JSON.parse(xhr.responseText));
@@ -42,12 +49,14 @@ function uploadFile(file) {
       }
     });
     xhr.addEventListener("error", () => {
+      setLoading(false);
       setDropLabel("Backend off — is :8000 running?");
       reject(new Error("network"));
     });
     const form = new FormData();
     form.append("file", file, file.name);
     setDropLabel("Uploading 0%");
+    setLoading(true);
     xhr.send(form);
   });
 }

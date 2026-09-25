@@ -22,7 +22,27 @@ body {
   font-family: var(--font-apple);
 }
 
-/* Primary action as filled Ink pill — Canvas text, arrow kept, same hit area. */
+/* Monument star — spins while a transfer runs, still monochrome. */
+.glyph {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.glyph.is-loading {
+  animation: apple-spin 1.1s linear infinite;
+}
+
+@keyframes apple-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glyph.is-loading {
+    animation: none;
+  }
+}
 .action-primary {
   background: var(--color-ink);
   color: var(--color-canvas);
