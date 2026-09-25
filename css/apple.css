@@ -25,6 +25,25 @@ body {
   font-family: var(--font-apple);
 }
 
+/* iOS-like page arrival — still, instant for reduced-motion users. */
+@media (prefers-reduced-motion: no-preference) {
+  main {
+    animation: apple-pagein 0.25s ease-out;
+  }
+
+  @keyframes apple-pagein {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
 /* Clarity slider — native range, Ink accent keeps it monochrome. */
 input[type="range"].clarity-range {
   width: 100%;
