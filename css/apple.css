@@ -43,6 +43,14 @@ body {
   z-index: var(--z-toast);
 }
 
+/* Reduce Transparency: glass goes near-solid, hierarchy preserved. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-alpha: 0.94;
+    --glass-blur: 4px;
+  }
+}
+
 /* iOS-like page arrival — still, instant for reduced-motion users. */
 @media (prefers-reduced-motion: no-preference) {
   main {

@@ -21,6 +21,13 @@
   function apply(v) {
     var alpha = (0.16 + (v / 100) * 0.76).toFixed(2);
     var blur = Math.round(12 + (v / 100) * 16) + 'px';
+    // Reduce Transparency wins over the slider: near-solid, hierarchy kept.
+    try {
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-transparency: reduce)').matches) {
+        alpha = '0.94';
+        blur = '4px';
+      }
+    } catch (_) {}
     var root = document.documentElement;
     root.style.setProperty('--glass-alpha', alpha);
     root.style.setProperty('--glass-blur', blur);
