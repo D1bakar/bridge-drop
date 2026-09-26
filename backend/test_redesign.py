@@ -51,3 +51,13 @@ def test_atmosphere_and_desktop():
 def test_dock_focus_visible():
     apple = client.get("/css/apple.css").text
     assert ".tabbar a:focus-visible" in apple
+
+
+def test_icon_dock_coherent():
+    for page in ("/", "/send.html", "/history.html", "/pair.html", "/settings.html"):
+        html = client.get(page).text
+        assert html.count('class="tab-glyph"') == 5, page
+        assert 'aria-current="page"' in html
+    apple = client.get("/css/apple.css").text
+    assert ".tab-glyph" in apple
+    assert "flex-direction: column" in apple
