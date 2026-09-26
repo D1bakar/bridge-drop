@@ -29,3 +29,14 @@ def test_page_drag_and_journey_wired():
     assert ".bridge-pulse" in css
     assert ".field.is-dragover" in css
     assert "body.is-dragging" in css
+
+
+def test_pair_flow_and_direction():
+    pair = client.get("/pair.html").text
+    assert "This device" in pair
+    assert "New phone" in pair
+    assert "flow-end" in client.get("/css/pages.css").text
+    feed = client.get("/js/feed.js").text
+    assert "dataset.dir" in feed
+    assert "dataset.dir" in client.get("/js/mock.js").text
+    assert '[data-dir="in"]' in client.get("/css/home.css").text
