@@ -16,6 +16,28 @@
     return a;
   }
 
+  // Destructive deletes ask twice: first tap arms ("Sure?"), second confirms.
+  // Disarms after 3 s. Same pattern on Home preview and History (HIG forgiveness).
+  function confirmDelete(linkEl, run) {
+    var armed = false;
+    var timer = null;
+    var original = linkEl.innerHTML;
+    linkEl.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (!armed) {
+        armed = true;
+        linkEl.innerHTML = 'Sure? <span aria-hidden="true">→</span>';
+        timer = setTimeout(function () {
+          armed = false;
+          linkEl.innerHTML = original;
+        }, 3000);
+        return;
+      }
+      clearTimeout(timer);
+      run();
+    });
+  }
+
   function pill(text, attention) {
     var s = document.createElement('span');
     s.className = 'pill' + (attention ? ' pill-attention' : '');
@@ -88,10 +110,7 @@
     } else {
       li.appendChild(pill(item.direction === 'out' ? 'Out' : 'In'));
       var del = link('Delete');
-      del.addEventListener('click', function (e) {
-        e.preventDefault();
-        delItem('file', item.id, li);
-      });
+      confirmDelete(del, function () { delItem('file', item.id, li); });
       li.appendChild(del);
     }
     return li;
@@ -128,11 +147,7 @@
       copyText(item.body);
     });
     var del = link('Delete');
-    del.addEventListener('click', function (e) {
-      e.preventDefault();
-      delItem('snippet', item.id, li);
-    });
-    li.appendChild(copy);
+    confirmDelete(del, function () { delItem('snippet', item.id, li); });
     li.appendChild(del);
     return li;
   }

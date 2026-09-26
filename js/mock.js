@@ -168,6 +168,27 @@ function actionLink(label) {
   return a;
 }
 
+// Same two-tap delete as history.js feed (HIG forgiveness, one pattern).
+function confirmDelete(linkEl, run) {
+  let armed = false;
+  let timer = null;
+  const original = linkEl.innerHTML;
+  linkEl.addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (!armed) {
+      armed = true;
+      linkEl.innerHTML = 'Sure? <span aria-hidden="true">→</span>';
+      timer = setTimeout(() => {
+        armed = false;
+        linkEl.innerHTML = original;
+      }, 3000);
+      return;
+    }
+    clearTimeout(timer);
+    await run();
+  });
+}
+
 async function apiDelete(path, base) {
   const headers = {};
   try {
@@ -348,8 +369,7 @@ function renderRecent(items = MOCK_RECENT, base = '') {
       li.appendChild(dec);
     } else if (r.onDelete && base) {
       const del = actionLink('Delete');
-      del.addEventListener('click', async (e) => {
-        e.preventDefault();
+      confirmDelete(del, async () => {
         try {
           await r.onDelete();
           toast('Deleted →');
