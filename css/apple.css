@@ -251,4 +251,9 @@ input[type="range"].clarity-range {
       background: var(--color-canvas);
     }
   }
+
+  /* Toast floats above the tab bar on phone, never behind it. */
+  .toast {
+    bottom: calc(96px + env(safe-area-inset-bottom));
+  }
 }
