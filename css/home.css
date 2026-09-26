@@ -111,8 +111,8 @@ body {
  * overrides below only. Desktop (≥720px) unchanged. */
 @media (max-width: 719px) {
   :root {
-    --above-monument: 48px;
-    --section-gap: 32px;
+    --above-monument: 32px;
+    --section-gap: 24px;
     --surface-pad: 20px;
   }
 
