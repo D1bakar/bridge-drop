@@ -93,8 +93,11 @@
     main.appendChild(name);
     main.appendChild(meta);
     li.appendChild(main);
+    // Trailing pill + actions live in one right-aligned cluster per row.
+    var side = document.createElement('div');
+    side.className = 'recent-side';
     if (item.status === 'pending') {
-      li.appendChild(pill('Waiting', true));
+      side.appendChild(pill('Waiting', true));
       var acc = link('Accept');
       acc.addEventListener('click', function (e) {
         e.preventDefault();
@@ -105,14 +108,15 @@
         e.preventDefault();
         declinePending(item);
       });
-      li.appendChild(acc);
-      li.appendChild(dec);
+      side.appendChild(acc);
+      side.appendChild(dec);
     } else {
-      li.appendChild(pill(item.direction === 'out' ? 'Out' : 'In'));
+      side.appendChild(pill(item.direction === 'out' ? 'Out' : 'In'));
       var del = link('Delete');
       confirmDelete(del, function () { delItem('file', item.id, li); });
-      li.appendChild(del);
+      side.appendChild(del);
     }
+    li.appendChild(side);
     return li;
   }
 
@@ -140,15 +144,19 @@
     main.appendChild(body);
     main.appendChild(meta);
     li.appendChild(main);
-    li.appendChild(pill(item.kind === 'link' ? 'Link' : 'Text'));
+    var bside = document.createElement('div');
+    bside.className = 'recent-side';
+    bside.appendChild(pill(item.kind === 'link' ? 'Link' : 'Text'));
     var copy = link('Copy');
     copy.addEventListener('click', function (e) {
       e.preventDefault();
       copyText(item.body);
     });
+    bside.appendChild(copy);
     var del = link('Delete');
     confirmDelete(del, function () { delItem('snippet', item.id, li); });
-    li.appendChild(del);
+    bside.appendChild(del);
+    li.appendChild(bside);
     return li;
   }
 
