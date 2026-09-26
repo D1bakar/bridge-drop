@@ -70,7 +70,8 @@ CREATE TABLE IF NOT EXISTS chunked (
     tmp_name TEXT NOT NULL DEFAULT '',
     final_name TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL DEFAULT 'uploading',
-    created_at REAL NOT NULL
+    created_at REAL NOT NULL,
+    client_key TEXT NOT NULL DEFAULT ''
 );
 """
 
@@ -89,6 +90,8 @@ def init_db() -> None:
         cols = {r["name"] for r in conn.execute("PRAGMA table_info(chunked)")}
         if "transfer_id" not in cols:
             conn.execute("ALTER TABLE chunked ADD COLUMN transfer_id TEXT NOT NULL DEFAULT ''")
+        if "client_key" not in cols:
+            conn.execute("ALTER TABLE chunked ADD COLUMN client_key TEXT NOT NULL DEFAULT ''")
         conn.commit()
 
 
