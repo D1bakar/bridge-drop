@@ -111,16 +111,23 @@
     var file = job.file;
     var rel = file.webkitRelativePath || file.name;
     var seen = job.seen || 0;
+    // Stable identity across tab kills: name + size + mtime re-attaches
+    // to the staged bytes instead of restarting (server validates offset).
+    var clientKey = [rel, file.size, file.lastModified || 0].join('|');
     try {
       var init = await window.BridgeApi.json('/v1/uploads/init', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: file.name, relPath: rel, size: file.size, mime: file.type || '' }),
+        body: JSON.stringify({ name: file.name, relPath: rel, size: file.size,
+          mime: file.type || '', client_key: clientKey }),
       });
       var uid = init.data.uploadId;
       job.uploadId = uid;
       var offset = init.data.offset || 0;
       seen = offset;
+      if (init.data.resumed && offset > 0) {
+        job.meta.textContent = 'Resumed — continuing…';
+      }
       var t0 = Date.now();
       while (offset < file.size) {
         if (job.cancelled) return;
