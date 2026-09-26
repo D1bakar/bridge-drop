@@ -56,8 +56,23 @@
 }
 
 .batch-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  row-gap: 8px;
   padding: var(--space-2) 0;
   border-top: var(--hairline);
+  min-width: 0;
+}
+
+.batch-row .recent-main {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.batch-row .batch-line {
+  flex: 1 1 100%;
 }
 
 .batch-row:last-child {
@@ -177,9 +192,12 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  flex-wrap: wrap;
   gap: var(--space-2);
+  row-gap: 8px;
   padding: var(--space-2) 0;
   border-top: var(--hairline);
+  min-width: 0;
 }
 
 .settings-row:last-child {
@@ -191,8 +209,9 @@
   line-height: var(--lead-body);
   letter-spacing: var(--tracking-body);
   color: var(--color-ink);
-  flex: 1 1 auto;
+  flex: 1 1 200px;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 /* Toast — design §6: bone, ink border, radius 10, auto-dismiss. */

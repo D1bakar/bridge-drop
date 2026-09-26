@@ -517,12 +517,15 @@ section > .pill {
 }
 
 /* Device row — design.md §6: subheading name, label meta, hairline rhythm, no fill.
- * flex-start + flex main packs the trailing pill right on every row. */
+ * flex-start + flex main packs the trailing pill right on every row.
+ * Wrap on narrow phones so actions drop below text instead of squeezing it. */
 .device {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  flex-wrap: wrap;
   gap: var(--space-2);
+  row-gap: 8px;
   min-height: 72px;
   padding: var(--space-2) 0;
   border-top: var(--hairline);
@@ -535,8 +538,9 @@ section > .pill {
 .device-main {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 4px;
-  flex: 1 1 auto;
+  flex: 1 1 200px;
   min-width: 0;
 }
 
@@ -584,7 +588,9 @@ section > .pill {
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  flex-wrap: wrap;
   gap: var(--space-2);
+  row-gap: 8px;
   padding: var(--space-2) 0;
   border-top: var(--hairline);
 }
@@ -622,8 +628,9 @@ section > .pill {
 .recent-main {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 4px;
-  flex: 1 1 auto;
+  flex: 1 1 200px;
   min-width: 0;
 }
 
@@ -665,19 +672,34 @@ section > .pill {
   text-align: center;
 }
 
-/* Trailing cluster: right-aligned, even rhythm between pill + actions. */
+/* Trailing cluster: right-aligned flex row, centered on text baseline.
+ * Wraps below text on narrow phones instead of squeezing it. */
 .recent-side {
   margin-left: auto;
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px 16px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
-.recent-side > * {
-  vertical-align: middle;
+.recent-side .action-secondary {
+  margin-top: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
-.recent-side > * + * {
-  margin-left: 16px;
+/* Row links never carry the standalone 16px top gap — it pushes text off baseline. */
+.device .action-secondary,
+.settings-row .action-secondary,
+.batch-row .action-secondary {
+  margin-top: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* Server-backed rows: name stays ink, no underline — tap opens the file */
