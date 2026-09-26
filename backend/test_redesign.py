@@ -39,3 +39,10 @@ def test_motion_explains_state():
     assert "toast-in" in pages
     assert "prefers-reduced-motion: no-preference" in pages
     assert "transition: width 150ms linear" in pages
+
+
+def test_atmosphere_and_desktop():
+    home = client.get("/css/home.css").text
+    assert "radial-gradient" in home
+    assert "min-width: 1200px" in home
+    assert "max-width: 760px" in home
