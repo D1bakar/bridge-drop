@@ -170,21 +170,124 @@ input[type="range"].clarity-range {
   border-bottom: none;
 }
 
-/* Bottom tab bar — phone only (max-width: 719px). Desktop keeps top text-nav. */
-.tabbar {
+/* Floating dock — ALL viewports. One nav only: the dock owns navigation,
+ * top text-links hide everywhere. Content extends beneath; main clears it. */
+.topnav {
   display: none;
 }
 
+main {
+  padding-bottom: calc(76px + env(safe-area-inset-bottom));
+}
+
+.tabbar {
+  display: flex;
+  position: fixed;
+  left: 16px;
+  right: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: var(--z-nav);
+  /* Liquid Glass, monochrome: clear Canvas, top light-bend, Ash edge, Ink text. */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 42%),
+    rgba(236, 236, 236, var(--glass-alpha));
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6) brightness(1.06);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.6) brightness(1.06);
+  border: 1px solid var(--color-ash);
+  border-radius: 24px;
+  box-shadow: var(--shadow-glass);
+  transition: border-color var(--duration) var(--ease),
+    box-shadow var(--duration) var(--ease);
+}
+
+/* Scroll edge: content passing beneath densifies the bar's separation. */
+.tabbar.is-scrolled {
+  border-color: rgba(38, 37, 35, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(38, 37, 35, 0.1),
+    0 1px 2px rgba(38, 37, 35, 0.12),
+    0 16px 40px rgba(38, 37, 35, 0.22);
+}
+
+.tabbar a {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  font-size: var(--type-foot);
+  font-weight: var(--weight-medium);
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  opacity: 0.65;
+  text-decoration: none;
+  /* Halo keeps labels readable over busy content on clear bar. */
+  text-shadow: 0 1px 8px rgba(236, 236, 236, 0.8);
+  position: relative;
+  z-index: 1;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.tabbar a[aria-current="page"] {
+  opacity: 1;
+  font-weight: 700;
+  background: rgba(38, 37, 35, 0.05);
+  border-radius: 16px;
+  margin: 6px 2px;
+  min-height: 44px;
+}
+
+.tabbar a:active {
+  opacity: var(--opacity-pressed);
+  transition-duration: var(--motion-fast);
+}
+
+/* Gliding selection pill — placed by js/tabbar.js, spring glide (design.md S7). */
+.tab-indicator {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: 0;
+  border-radius: 16px;
+  background: rgba(38, 37, 35, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(38, 37, 35, 0.08);
+  transition: left var(--duration) var(--ease-spring), width var(--duration) var(--ease-spring);
+  z-index: 0;
+}
+
+/* JS owns the pill: static per-link background stands down. */
+.tabbar.has-glide a[aria-current="page"] {
+  background: none;
+  border-radius: 0;
+  margin: 0;
+  min-height: 56px;
+}
+
+/* No-blur screens: solid Canvas keeps labels readable, shape unchanged. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tabbar {
+    background: var(--color-canvas);
+  }
+}
+
+/* Toast floats above the dock, never behind it. */
+.toast {
+  bottom: calc(96px + env(safe-area-inset-bottom));
+}
+
+/* Desktop: the dock compacts to the center — same object, narrower stance. */
+@media (min-width: 720px) {
+  .tabbar {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(560px, calc(100vw - 80px));
+  }
+}
+
 @media (max-width: 719px) {
-  main {
-    padding-bottom: calc(76px + env(safe-area-inset-bottom));
-  }
-
-  /* One nav only: tab bar owns phone navigation, top links hide. */
-  .topnav {
-    display: none;
-  }
-
   /* iOS large title on sub-pages — 34px bold, phone only. Home monument stays. */
   .page-heading {
     font-size: 34px;
@@ -197,102 +300,5 @@ input[type="range"].clarity-range {
   /* Compact first fold — Send button hugs the monument on phone. */
   .action-primary {
     margin-top: var(--space-2);
-  }
-
-  .tabbar {
-    display: flex;
-    position: fixed;
-    left: 16px;
-    right: 16px;
-    bottom: calc(16px + env(safe-area-inset-bottom));
-    z-index: var(--z-nav);
-    /* Liquid Glass, monochrome: clear Canvas, top light-bend, Ash edge, Ink text. */
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 42%),
-      rgba(236, 236, 236, var(--glass-alpha));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6) brightness(1.06);
-    backdrop-filter: blur(var(--glass-blur)) saturate(1.6) brightness(1.06);
-    border: 1px solid var(--color-ash);
-    border-radius: 24px;
-    box-shadow: var(--shadow-glass);
-    transition: border-color var(--duration) var(--ease),
-      box-shadow var(--duration) var(--ease);
-  }
-
-  /* Scroll edge: content passing beneath densifies the bar's separation. */
-  .tabbar.is-scrolled {
-    border-color: rgba(38, 37, 35, 0.35);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      inset 0 -1px 0 rgba(38, 37, 35, 0.1),
-      0 1px 2px rgba(38, 37, 35, 0.12),
-      0 16px 40px rgba(38, 37, 35, 0.22);
-  }
-
-  .tabbar a {
-    flex: 1 1 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 56px;
-    font-size: 12px;
-    font-weight: var(--weight-medium);
-    letter-spacing: -0.02em;
-    color: var(--color-ink);
-    opacity: 0.65;
-    text-decoration: none;
-    /* Halo keeps 12px labels readable over busy content on clear bar. */
-    text-shadow: 0 1px 8px rgba(236, 236, 236, 0.8);
-    position: relative;
-    z-index: 1;
-    transition: opacity var(--duration) var(--ease);
-  }
-
-  .tabbar a[aria-current="page"] {
-    opacity: 1;
-    font-weight: 700;
-    background: rgba(38, 37, 35, 0.05);
-    border-radius: 16px;
-    margin: 6px 2px;
-    min-height: 44px;
-  }
-
-  .tabbar a:active {
-    opacity: var(--opacity-pressed);
-    transition-duration: var(--motion-fast);
-  }
-
-  /* Gliding selection pill — placed by js/tabbar.js, spring glide (design.md S7). */
-  .tab-indicator {
-    position: absolute;
-    top: 6px;
-    bottom: 6px;
-    left: 0;
-    width: 0;
-    border-radius: 16px;
-    background: rgba(38, 37, 35, 0.05);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
-      inset 0 -1px 0 rgba(38, 37, 35, 0.08);
-    transition: left var(--duration) var(--ease-spring), width var(--duration) var(--ease-spring);
-    z-index: 0;
-  }
-
-  /* JS owns the pill: static per-link background stands down. */
-  .tabbar.has-glide a[aria-current="page"] {
-    background: none;
-    border-radius: 0;
-    margin: 0;
-    min-height: 56px;
-  }
-
-  /* No-blur phones: solid Canvas keeps labels readable, shape unchanged. */
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-    .tabbar {
-      background: var(--color-canvas);
-    }
-  }
-
-  /* Toast floats above the tab bar on phone, never behind it. */
-  .toast {
-    bottom: calc(96px + env(safe-area-inset-bottom));
   }
 }
