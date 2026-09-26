@@ -86,6 +86,23 @@
   display: inline-block;
 }
 
+/* Connection flow endpoints: THIS DEVICE ↕ code ↕ NEW PHONE. */
+.flow-end {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  opacity: 0.6;
+  margin: var(--space-3) 0 0;
+}
+
+.flow-end + .pair-block,
+.pair-block + .flow-end {
+  margin-top: var(--space-2);
+}
+
 .pair-qr {
   display: block;
   width: min(280px, 100%);
