@@ -202,29 +202,30 @@ body {
   }
 }
 
-/* Drop zone idle — design.md §6: transparent, 1px Ash, radius 10, min-height 240, label only */
+/* Drop zone hero — the transfer surface dominates Home: tall, airy,
+ * label set large. Drag-over deepens border + label per design §6. */
 .dropzone {
-  margin-top: var(--space-3);
+  margin-top: var(--space-4);
   background: transparent;
   border: 1px solid var(--color-ash);
-  border-radius: var(--radius-surface);
-  padding: var(--surface-pad);
-  min-height: 240px;
+  border-radius: var(--r-lg);
+  padding: var(--space-4);
+  min-height: 320px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  gap: var(--space-2);
   position: relative;
   box-shadow: var(--shadow-1);
   transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
 }
 
 .dropzone-label {
-  font-size: var(--text-label);
-  font-weight: var(--weight-medium);
-  text-transform: uppercase;
+  font-size: var(--type-t2);
+  font-weight: var(--w-reg);
   letter-spacing: -0.02em;
-  line-height: var(--leading-small);
+  line-height: var(--lead-tight);
   color: var(--color-ink);
 }
 
