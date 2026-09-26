@@ -69,6 +69,35 @@
   --ease: ease-out;
   --opacity-pressed: 0.6;
   --opacity-disabled: 0.35;
+
+  /* Redesign system (additive — adopted per-component in later slices).
+   * HIG type ramp, SF-first stack, coherent radii + spacing + layers. */
+  --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', system-ui, sans-serif;
+  --type-display: clamp(56px, 16vw, 148px);
+  --type-ltitle: 34px;
+  --type-t1: 28px;
+  --type-t2: 22px;
+  --type-head: 17px;
+  --type-body: 17px;
+  --type-sub: 15px;
+  --type-foot: 13px;
+  --type-cap: 12px;
+  --lead-tight: 1.1;
+  --lead-body: 1.45;
+  --w-reg: 400;
+  --w-med: 500;
+  --w-semi: 600;
+  --w-bold: 700;
+  --space-half: 4px;
+  --space-4: 32px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+  --z-content: 1;
+  --z-func: 50;
+  --z-sheet: 70;
+  --motion-slow: 350ms;
 }
 
 @media (min-width: 720px) {
