@@ -147,7 +147,7 @@
       li.remove();
       window.BridgeApi.toast('Deleted →');
     } catch (e) {
-      window.BridgeApi.toast('Delete failed — try again.');
+      window.BridgeApi.toast('Delete failed — try again.', { sticky: true });
     }
   }
 
@@ -165,7 +165,7 @@
       window.BridgeApi.toast('Received →');
       return true;
     } catch (e) {
-      window.BridgeApi.toast('Accept failed — try again.');
+      window.BridgeApi.toast('Accept failed — try again.', { sticky: true });
       return false;
     }
   }
@@ -181,7 +181,7 @@
       window.BridgeApi.toast('Declined →');
       return true;
     } catch (e) {
-      window.BridgeApi.toast('Decline failed — try again.');
+      window.BridgeApi.toast('Decline failed — try again.', { sticky: true });
       return false;
     }
   }
@@ -195,7 +195,7 @@
       window.BridgeApi.toast('Deleted →');
       return true;
     } catch (e) {
-      window.BridgeApi.toast('Delete failed — try again.');
+      window.BridgeApi.toast('Delete failed — try again.', { sticky: true });
       return false;
     }
   }
@@ -225,7 +225,7 @@
         list.appendChild(item.type === 'snippet' ? snippetRow(item) : fileRow(item, out.base));
       });
     } catch (e) {
-      window.BridgeApi.toast('History offline — is :8000 running?');
+      window.BridgeApi.toast('History offline — is :8000 running?', { sticky: true });
     }
   }
 

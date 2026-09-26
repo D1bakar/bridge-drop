@@ -178,8 +178,8 @@ async function apiDelete(path, base) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
 
-function toast(text) {
-  if (window.BridgeApi) window.BridgeApi.toast(text);
+function toast(text, opts) {
+  if (window.BridgeApi) window.BridgeApi.toast(text, opts);
 }
 
 async function refreshRecentFromServer() {
@@ -330,7 +330,7 @@ function renderRecent(items = MOCK_RECENT, base = '') {
           toast('Received →');
           refreshRecentFromServer();
         } catch (_) {
-          toast('Accept failed — try again.');
+          toast('Accept failed — try again.', { sticky: true });
         }
       });
       const dec = actionLink('Decline');
@@ -341,7 +341,7 @@ function renderRecent(items = MOCK_RECENT, base = '') {
           toast('Declined →');
           refreshRecentFromServer();
         } catch (_) {
-          toast('Decline failed — try again.');
+          toast('Decline failed — try again.', { sticky: true });
         }
       });
       li.appendChild(acc);
@@ -355,7 +355,7 @@ function renderRecent(items = MOCK_RECENT, base = '') {
           toast('Deleted →');
           refreshRecentFromServer();
         } catch (_) {
-          toast('Delete failed — try again.');
+          toast('Delete failed — try again.', { sticky: true });
         }
       });
       li.appendChild(del);
