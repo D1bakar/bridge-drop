@@ -242,6 +242,12 @@ main {
   transition-duration: var(--motion-fast);
 }
 
+.tabbar a:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  border-radius: var(--r-md);
+}
+
 /* Gliding selection pill — placed by js/tabbar.js, spring glide (design.md S7). */
 .tab-indicator {
   position: absolute;
