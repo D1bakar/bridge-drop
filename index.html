@@ -34,15 +34,22 @@
     </nav>
   </header>
   <main id="home">
-    <h1 class="monument">Drop<br />here.<svg class="glyph" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><g stroke="currentColor" stroke-width="9" stroke-linecap="round"><line x1="50" y1="8" x2="50" y2="92" /><line x1="13" y1="29" x2="87" y2="71" /><line x1="87" y1="29" x2="13" y2="71" /></g></svg></h1>
-    <a class="action-primary" href="send.html">Send <span aria-hidden="true">→</span></a>
+    <p class="eyebrow" id="net-status" aria-live="polite">Checking…</p>
+    <h1 class="monument">Drop<br />here.</h1>
 
-    <!-- .is-dragover toggled by js/dropzone.js; picker wired by js/upload.js -->
-    <section class="dropzone" id="dropzone" aria-label="Drop files">
+    <!-- Transfer field: the spatial hero. IDs kept for js/dropzone.js + js/upload.js. -->
+    <section class="field" id="dropzone" aria-label="Transfer field">
+      <svg class="bridge-mark" viewBox="0 0 120 120" aria-hidden="true" focusable="false"><g stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none"><circle cx="60" cy="26" r="10" /><circle cx="60" cy="94" r="10" /><line x1="60" y1="36" x2="60" y2="84" /></g><g class="bridge-pulse" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none"><circle cx="60" cy="60" r="4" /></g></svg>
       <span class="dropzone-label" aria-live="polite">Drop files here</span>
       <label class="action-secondary" for="file-input" tabindex="0">Choose files <span aria-hidden="true">→</span></label>
       <input class="file-input" id="file-input" type="file" />
+      <a class="dest" id="dest" href="pair.html" data-state="checking" aria-label="Destination device">
+        <span class="dest-dot" aria-hidden="true"></span>
+        <span class="dest-name" id="dest-name">My PC</span>
+        <span class="dest-state" id="dest-state">Checking…</span>
+      </a>
     </section>
+    <a class="action-primary" href="send.html">Send <span aria-hidden="true">→</span></a>
 
     <section class="devices-section" aria-label="Devices">
       <span class="pill">Paired</span>
@@ -71,7 +78,6 @@
 
     <section class="recent" id="recent" aria-label="Recent transfers">
       <span class="pill">Recent</span>
-      <span class="pill" id="net-status">Checking…</span>
       <ul class="recent-list" id="recent-list">
         <li class="recent-row">
           <div class="recent-main">
