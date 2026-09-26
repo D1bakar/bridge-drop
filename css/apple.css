@@ -130,7 +130,8 @@ input[type="range"].clarity-range {
 .batch-list .batch-row {
   border-top: none;
   border-bottom: 1px solid var(--color-ash);
-  margin: 0 16px;
+  /* 15 px + 1 px card border = 16 px text column, exact. */
+  margin: 0 15px;
   padding-left: 0;
   padding-right: 0;
 }

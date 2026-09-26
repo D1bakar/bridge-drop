@@ -304,6 +304,12 @@ body {
   padding: 6px 12px;
 }
 
+/* Section pills join the 16 px text column: 12 px padding + 4 px nudge.
+ * Status pills inside rows (flex end) are untouched. */
+section > .pill {
+  margin-left: 4px;
+}
+
 /* Attention status — design.md §6: words carry meaning, Ink border adds weight */
 .pill-attention {
   border: 1px solid var(--color-ink);

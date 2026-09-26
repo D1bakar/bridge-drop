@@ -20,3 +20,10 @@ def test_large_title_locked():
     assert ".page-heading" in apple
     pages = client.get("/css/pages.css").text
     assert "clamp(40px, 13vw, 64px)" not in pages
+
+
+def test_one_text_column():
+    home = client.get("/css/home.css").text
+    assert "section > .pill" in home
+    apple = client.get("/css/apple.css").text
+    assert "margin: 0 15px" in apple
