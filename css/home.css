@@ -12,6 +12,12 @@ body {
   padding: 0;
 }
 
+/* Meta lines sit inside iOS inset groups — no UA margins, rhythm from tokens. */
+p.recent-meta {
+  margin: 0;
+  margin-top: var(--space-1);
+}
+
 /* Anchor jumps glide; reduced-motion users get instant jumps (design §7) */
 html {
   scroll-behavior: smooth;

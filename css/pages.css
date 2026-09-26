@@ -209,6 +209,24 @@
   max-width: 480px;
 }
 
+/* Bare sections (id/aria-label only, no class) join the token rhythm.
+ * Classed blocks (.devices-section, .recent, .dropzone…) own their own gap. */
+main > section:not([class]) {
+  margin-top: var(--section-gap);
+}
+
+/* First block after the heading keeps its child-driven gap (24px),
+ * so the first fold doesn't double up. */
+main > h1 + section:not([class]) {
+  margin-top: 0;
+}
+
+/* Standalone pair codes align with inset card-row text (16px + 1px border). */
+#claim-block .pair-code,
+#paired-block .pair-code {
+  margin-left: 16px;
+}
+
 /* Crossfade between pages — design §7: 200ms, instant on reduced motion. */
 main {
   animation: page-in var(--duration) var(--ease);
@@ -229,8 +247,9 @@ main {
 /* Compact mobile density for sub-pages — same rules as home: natural scroll,
  * tighter rhythm, desktop unchanged. */
 @media (max-width: 719px) {
+  /* iOS 27 large title locked at 34px (apple.css) — no competing scale here. */
   .page-heading {
-    font-size: clamp(40px, 13vw, 64px);
+    font-size: 34px;
     margin-top: 48px;
   }
 
