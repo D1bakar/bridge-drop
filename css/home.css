@@ -649,6 +649,15 @@ section > .pill {
   flex-shrink: 0;
 }
 
+/* Direction marks: drawn, never spoken (words stay clean for SR). */
+.recent-row .pill[data-dir="in"]::before {
+  content: "↓ ";
+}
+
+.recent-row .pill[data-dir="out"]::before {
+  content: "↑ ";
+}
+
 /* Status pills share one width (fits WAITING) so the column reads straight. */
 .recent-row .pill,
 .device .pill {

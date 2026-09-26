@@ -111,7 +111,10 @@
       side.appendChild(acc);
       side.appendChild(dec);
     } else {
-      side.appendChild(pill(item.direction === 'out' ? 'Out' : 'In'));
+      var dpill = pill(item.direction === 'out' ? 'Out' : 'In');
+      // Direction lives in data (CSS draws the mark); words stay clean for SR.
+      dpill.dataset.dir = item.direction === 'out' ? 'out' : 'in';
+      side.appendChild(dpill);
       var del = link('Delete');
       confirmDelete(del, function () { delItem('file', item.id, li); });
       side.appendChild(del);
