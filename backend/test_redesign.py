@@ -25,3 +25,10 @@ def test_ramp_adopted_not_decorative():
     pages = client.get("/css/pages.css").text
     assert "var(--type-body)" in pages
     assert "var(--type-foot)" in pages
+
+
+def test_dock_owns_navigation():
+    apple = client.get("/css/apple.css").text.replace("\r\n", "\n")
+    assert ".topnav {\n  display: none;" in apple
+    assert ".tabbar {\n  display: flex;" in apple
+    assert "translateX(-50%)" in apple
