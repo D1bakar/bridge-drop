@@ -2,7 +2,7 @@
  * API (/v1/*) is always network-only: transfers must never serve stale bytes.
  * Bump CACHE when the shell changes.
  */
-const CACHE = 'bridge-v4';
+const CACHE = 'bridge-v5';
 const SHELL = [
   '/',
   '/send.html',
