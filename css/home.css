@@ -139,7 +139,7 @@ body {
   }
 
   .device-name {
-    font-size: 26px;
+    font-size: var(--type-t3);
   }
 
   .recent-row {
@@ -156,7 +156,7 @@ body {
   }
 
   .recent-empty-title {
-    font-size: 26px;
+    font-size: var(--type-t3);
   }
 
   .topnav {
@@ -182,9 +182,9 @@ body {
   align-items: center;
   gap: 8px;
   margin-top: var(--space-3);
-  font-size: var(--text-subheading);
-  line-height: var(--leading-subheading);
-  letter-spacing: var(--tracking-subheading);
+  font-size: var(--type-t1);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   font-weight: var(--weight-regular);
   color: var(--color-ink);
   text-decoration: none;
@@ -202,29 +202,30 @@ body {
   }
 }
 
-/* Drop zone idle — design.md §6: transparent, 1px Ash, radius 10, min-height 240, label only */
+/* Drop zone hero — the transfer surface dominates Home: tall, airy,
+ * label set large. Drag-over deepens border + label per design §6. */
 .dropzone {
-  margin-top: var(--space-3);
+  margin-top: var(--space-4);
   background: transparent;
   border: 1px solid var(--color-ash);
-  border-radius: var(--radius-surface);
-  padding: var(--surface-pad);
-  min-height: 240px;
+  border-radius: var(--r-lg);
+  padding: var(--space-4);
+  min-height: 320px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
+  gap: var(--space-2);
   position: relative;
   box-shadow: var(--shadow-1);
   transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
 }
 
 .dropzone-label {
-  font-size: var(--text-label);
-  font-weight: var(--weight-medium);
-  text-transform: uppercase;
+  font-size: var(--type-t2);
+  font-weight: var(--w-reg);
   letter-spacing: -0.02em;
-  line-height: var(--leading-small);
+  line-height: var(--lead-tight);
   color: var(--color-ink);
 }
 
@@ -255,9 +256,9 @@ body {
   align-items: center;
   gap: 8px;
   margin-top: var(--space-2);
-  font-size: var(--text-body);
-  line-height: 1.2;
-  letter-spacing: var(--tracking-body);
+  font-size: var(--type-body);
+  line-height: var(--lead-body);
+  letter-spacing: -0.02em;
   font-weight: var(--weight-medium);
   color: var(--color-ink);
   text-decoration: none;
@@ -346,7 +347,7 @@ section > .pill {
 }
 
 .device-meta {
-  font-size: var(--text-label);
+  font-size: var(--type-foot);
   font-weight: var(--weight-medium);
   text-transform: uppercase;
   letter-spacing: -0.02em;
@@ -356,10 +357,10 @@ section > .pill {
 }
 
 .device-name {
-  font-size: var(--text-subheading);
-  line-height: var(--leading-subheading);
-  letter-spacing: var(--tracking-subheading);
-  font-weight: var(--weight-regular);
+  font-size: var(--type-t2);
+  line-height: var(--lead-tight);
+  letter-spacing: -0.02em;
+  font-weight: var(--w-med);
   color: var(--color-ink);
   min-width: 0;
   overflow-wrap: anywhere;
@@ -417,9 +418,9 @@ section > .pill {
 
 .recent-empty-title {
   display: block;
-  font-size: var(--text-subheading);
-  line-height: var(--leading-subheading);
-  letter-spacing: var(--tracking-subheading);
+  font-size: var(--type-t2);
+  line-height: var(--lead-tight);
+  letter-spacing: -0.02em;
   font-weight: var(--weight-regular);
   color: var(--color-ink);
 }
@@ -433,7 +434,7 @@ section > .pill {
 }
 
 .recent-meta {
-  font-size: var(--text-caption);
+  font-size: var(--type-foot);
   line-height: var(--leading-small);
   letter-spacing: -0.02em;
   font-weight: var(--weight-regular);
@@ -441,8 +442,8 @@ section > .pill {
 }
 
 .recent-name {
-  font-size: var(--text-body);
-  line-height: var(--leading-ui);
+  font-size: var(--type-body);
+  line-height: var(--lead-body);
   letter-spacing: var(--tracking-body);
   font-weight: var(--weight-regular);
   color: var(--color-ink);

@@ -39,7 +39,7 @@
 }
 
 .transfer-meta {
-  font-size: var(--text-caption);
+  font-size: var(--type-foot);
   line-height: var(--leading-small);
   letter-spacing: -0.02em;
   color: var(--color-ink);
@@ -102,7 +102,7 @@
 /* Inputs — design §6: transparent, ash border, radius 10, visible label. */
 .field-label {
   display: block;
-  font-size: var(--text-caption);
+  font-size: var(--type-foot);
   line-height: var(--leading-small);
   letter-spacing: -0.02em;
   color: var(--color-ink);
@@ -117,7 +117,7 @@
   border: 1px solid var(--color-ash);
   border-radius: var(--radius-surface);
   color: var(--color-ink);
-  font-size: var(--text-body);
+  font-size: var(--type-body);
   font-family: var(--font-primary);
   padding: 16px;
   box-sizing: border-box;
@@ -137,7 +137,7 @@
 }
 
 .field-error {
-  font-size: var(--text-caption);
+  font-size: var(--type-foot);
   line-height: var(--leading-small);
   color: var(--color-ink);
   margin-top: var(--space-1);
@@ -167,8 +167,8 @@
 }
 
 .settings-name {
-  font-size: var(--text-body);
-  line-height: var(--leading-ui);
+  font-size: var(--type-body);
+  line-height: var(--lead-body);
   letter-spacing: var(--tracking-body);
   color: var(--color-ink);
   flex: 1 1 auto;
@@ -185,7 +185,7 @@
   border: 1px solid var(--color-ink);
   border-radius: var(--radius-surface);
   color: var(--color-ink);
-  font-size: var(--text-body);
+  font-size: var(--type-body);
   padding: 16px;
   opacity: 1;
   transition: opacity var(--duration) var(--ease);
