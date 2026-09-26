@@ -454,6 +454,13 @@ section > .pill {
   flex-shrink: 0;
 }
 
+/* Status pills share one width (fits WAITING) so the column reads straight. */
+.recent-row .pill,
+.device .pill {
+  min-width: 80px;
+  text-align: center;
+}
+
 /* Trailing cluster: right-aligned, even rhythm between pill + actions. */
 .recent-side {
   margin-left: auto;
