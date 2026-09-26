@@ -354,6 +354,7 @@ function renderRecent(items = MOCK_RECENT, base = '') {
     const pill = document.createElement('span');
     pill.className = 'pill' + (r.pending ? ' pill-attention' : '');
     pill.textContent = r.pending ? 'Waiting' : r.direction;
+    if (!r.pending) pill.dataset.dir = r.direction === 'Out' ? 'out' : 'in';
     side.appendChild(pill);
 
     // Every row you shared or received can go: history row + file, together.
