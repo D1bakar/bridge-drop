@@ -21,6 +21,9 @@ p.recent-meta {
 /* Anchor jumps glide; reduced-motion users get instant jumps (design §7) */
 html {
   scroll-behavior: smooth;
+  /* HIG text-size readiness: never block user scaling; single-column reflows. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
