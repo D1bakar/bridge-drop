@@ -21,6 +21,23 @@ function setDropLabel(text) {
   if (label) label.textContent = text;
 }
 
+function setTx(frac) {
+  // Drives the pulse journey across the bridge mark (R3 transfer motion).
+  const zone = document.getElementById("dropzone");
+  if (zone) zone.style.setProperty("--tx", Math.max(0, Math.min(1, frac || 0)));
+}
+
+function flashDone() {
+  const zone = document.getElementById("dropzone");
+  if (!zone) return;
+  setTx(1);
+  zone.classList.add("is-done");
+  setTimeout(() => {
+    zone.classList.remove("is-done");
+    setTx(0);
+  }, 1400);
+}
+
 function setLoading(on) {
   // Bridge mark breathes while bytes move; null-safe off Home.
   const mark = document.querySelector(".bridge-mark") || document.querySelector(".glyph");
@@ -37,6 +54,7 @@ function uploadFile(file) {
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
         setDropLabel(`Uploading ${Math.round((e.loaded / e.total) * 100)}%`);
+        setTx(e.total ? e.loaded / e.total : 0);
       } else {
         setDropLabel("Uploading…");
       }
@@ -45,15 +63,18 @@ function uploadFile(file) {
       setLoading(false);
       if (xhr.status === 201) {
         setDropLabel("Received →");
+        flashDone();
         resolve(JSON.parse(xhr.responseText));
       } else {
         setDropLabel("Failed — try again");
+        setTx(0);
         reject(new Error(`upload ${xhr.status}`));
       }
     });
     xhr.addEventListener("error", () => {
       setLoading(false);
       setDropLabel("Backend off — is :8000 running?");
+      setTx(0);
       reject(new Error("network"));
     });
     const form = new FormData();

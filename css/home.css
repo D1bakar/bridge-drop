@@ -267,6 +267,24 @@ body {
   animation: bridge-breathe 1.2s ease-in-out infinite;
 }
 
+/* Transfer journey: the pulse rides the bridge line top→device,
+ * driven by upload progress via --tx (0..1) on the field. */
+.bridge-pulse {
+  transform-box: fill-box;
+  transform: translateY(calc(-19px + var(--tx, 0) * 38px));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bridge-pulse {
+    transition: transform 150ms linear;
+  }
+}
+
+/* Arrival: the field confirms, then settles (cleared by js/upload.js). */
+.field.is-done {
+  border-color: var(--color-ink);
+}
+
 @keyframes bridge-breathe {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.25; }
