@@ -252,8 +252,9 @@ main {
     font-size: 34px;
   }
 
+  /* Numerals rank below the 34 px title (HIG Title 1). */
   .transfer-pct {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .pair-block {
@@ -266,7 +267,7 @@ main {
   }
 
   .pair-code {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .pending {
