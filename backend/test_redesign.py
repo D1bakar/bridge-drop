@@ -46,3 +46,8 @@ def test_atmosphere_and_desktop():
     assert "radial-gradient" in home
     assert "min-width: 1200px" in home
     assert "max-width: 760px" in home
+
+
+def test_dock_focus_visible():
+    apple = client.get("/css/apple.css").text
+    assert ".tabbar a:focus-visible" in apple
