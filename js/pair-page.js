@@ -108,7 +108,9 @@
         main.appendChild(meta);
         main.appendChild(name);
         li.appendChild(main);
-        li.appendChild(pill('Paired'));
+        var side = document.createElement('div');
+        side.className = 'recent-side';
+        side.appendChild(pill('Paired'));
         var rename = link('Rename');
         rename.addEventListener('click', function (e) {
           e.preventDefault();
@@ -124,8 +126,9 @@
             revoke.innerHTML = 'Confirm revoke <span aria-hidden="true">→</span>';
           }
         });
-        li.appendChild(rename);
-        li.appendChild(revoke);
+        side.appendChild(rename);
+        side.appendChild(revoke);
+        li.appendChild(side);
         list.appendChild(li);
       });
     } catch (e) {
