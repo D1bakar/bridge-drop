@@ -193,7 +193,8 @@ async function refreshRecentFromServer() {
         renderRecentEmpty(); // server up, nothing shared yet — no fake mock
         return true;
       }
-      renderRecent(feed.data.items.map((f) => {
+      // Home shows the latest 3 only — full feed lives on history.html.
+      renderRecent(feed.data.items.slice(0, 3).map((f) => {
         const rel = f.saved_path || f.name;
         const url = `${base}/v1/files/${rel.split('/').map(encodeURIComponent).join('/')}`;
         const mime = (f.mime || '').toLowerCase();
