@@ -95,6 +95,8 @@ Amendment 25 Sep 2026 (owner override): Apple-like structure WITHOUT color. Mono
 
 Amendment 26 Sep 2026 (HIG layout pass, developer.apple.com/design/human-interface-guidelines/layout): phone follows HIG compact metrics — 16 pt screen-edge margin (`--edge: 16px` under 720 px), 8 pt spacing unit (no off-grid phone values), 16 pt card internal padding (`--surface-pad: 16px` on phone), 44 pt minimum touch targets (already met via `--hit-min: 48px`, tab bar 56 px), safe-area insets on all four edges (already wired, keep). Desktop keeps the 40 px source-style edge (tray utility, not an iOS width class). Deliberate deviations: phone `--section-gap` stays 24 px (compact Home override, HIG section spacing is 32 pt) and the tab bar stays floating Liquid Glass instead of edge-to-edge.
 
+Amendment 26 Sep 2026 (HIG design principles, developer.apple.com/design/human-interface-guidelines/design-principles): feedback must persist on failure (success toasts auto-dismiss 4 s, error toasts stay until tapped — `role="status"` already announces both); destructive deletes need forgiveness (two-tap arm-and-confirm, files + snippets, Home preview + History); progress stays visible in place (dropzone label, batch numeral) and is announced via `aria-live="polite"`; words stay in the user's vocabulary (no error codes on screen); one consistent Delete pattern everywhere, no per-page inventions.
+
 6. Components
 Wordmark [S]
 
