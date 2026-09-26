@@ -10,7 +10,8 @@
   --apple-btn-pad-y: 14px;
   --apple-btn-pad-x: 24px;
   /* iOS-like layered depth, monochrome: specular top light, Ink shadows. */
-  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.55),
+  --shadow-glass: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -1px 0 rgba(38, 37, 35, 0.1),
     0 1px 2px rgba(38, 37, 35, 0.08),
     0 12px 32px rgba(38, 37, 35, 0.16);
   --shadow-btn: inset 0 1px 0 rgba(255, 255, 255, 0.14),
@@ -172,10 +173,12 @@ input[type="range"].clarity-range {
     right: 16px;
     bottom: calc(16px + env(safe-area-inset-bottom));
     z-index: 50;
-    /* Liquid Glass, monochrome: frosted Canvas, Ash edge, Ink text. */
-    background: rgba(236, 236, 236, var(--glass-alpha));
-    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
-    backdrop-filter: blur(var(--glass-blur)) saturate(1.5);
+    /* Liquid Glass, monochrome: clear Canvas, top light-bend, Ash edge, Ink text. */
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 42%),
+      rgba(236, 236, 236, var(--glass-alpha));
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.6) brightness(1.06);
+    backdrop-filter: blur(var(--glass-blur)) saturate(1.6) brightness(1.06);
     border: 1px solid var(--color-ash);
     border-radius: 24px;
     box-shadow: var(--shadow-glass);
@@ -220,7 +223,8 @@ input[type="range"].clarity-range {
     width: 0;
     border-radius: 16px;
     background: rgba(38, 37, 35, 0.05);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
+      inset 0 -1px 0 rgba(38, 37, 35, 0.08);
     transition: left var(--duration) var(--ease), width var(--duration) var(--ease);
     z-index: 0;
   }
