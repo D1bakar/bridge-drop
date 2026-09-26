@@ -176,6 +176,17 @@ body {
   }
 }
 
+/* Large desktop: content settles into a reading column; the wordmark
+ * stays full-width left (editorial asymmetry). Tablet keeps the
+ * single-column utility density deliberately — no in-between layout. */
+@media (min-width: 1200px) {
+  main {
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 /* Monument — design.md §6/§8: one oversized element, left-bleeding, stacked */
 .monument {
   font-size: var(--text-monument);
