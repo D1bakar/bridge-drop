@@ -19,17 +19,28 @@
     bar.appendChild(ind);
     bar.classList.add('has-glide');
     var cur = bar.querySelector('a[aria-current="page"]');
+    // First paint: park under active tab with no slide (else it glides in from Home/left:0).
+    ind.style.transition = 'none';
     if (cur) place(ind, cur);
-    window.addEventListener('resize', function () {
+    void ind.offsetWidth;
+    requestAnimationFrame(function () { ind.style.transition = ''; });
+    function repin() {
       var c = bar.querySelector('a[aria-current="page"]');
       if (c) place(ind, c);
-    });
+    }
+    window.addEventListener('resize', repin);
+    window.addEventListener('load', repin);
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(repin); }
     bar.addEventListener('click', function (e) {
       var a = e.target && e.target.closest ? e.target.closest('a') : null;
       if (!a || a.getAttribute('aria-current') === 'page') return;
+      // Let new-tab / new-window gestures use the browser default.
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || (e.button !== undefined && e.button !== 0)) return;
+      var href = a.getAttribute('href');
+      // Reduced-motion users: no glide delay, navigate instantly (design.md S7).
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       e.preventDefault();
       place(ind, a);
-      var href = a.getAttribute('href');
       setTimeout(function () { window.location.href = href; }, 230);
     });
   });
