@@ -143,6 +143,15 @@ body {
     padding: 12px 0;
   }
 
+  /* One-line composer until focus — compact Home, grows like iOS. */
+  .snippet-form .field-area {
+    min-height: 48px;
+  }
+
+  .snippet-form .field-area:focus {
+    min-height: 96px;
+  }
+
   .recent-empty-title {
     font-size: 26px;
   }
