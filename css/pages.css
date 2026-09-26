@@ -36,6 +36,8 @@
   height: 2px;
   width: 0%;
   background: var(--color-ink);
+  /* Linear tracking: smooths chunk jumps without editorializing speed. */
+  transition: width 150ms linear;
 }
 
 .transfer-meta {
@@ -72,6 +74,7 @@
   height: 1px;
   width: 0%;
   background: var(--color-ink);
+  transition: width 150ms linear;
 }
 
 /* Pairing block — design §6: QR ink-on-canvas, quiet zone kept, nested surface. */
