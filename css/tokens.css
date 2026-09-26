@@ -80,6 +80,13 @@
   }
 }
 
+/* HIG compact width: 16 pt screen-edge margin on phone. Desktop keeps 40 px. */
+@media (max-width: 719px) {
+  :root {
+    --edge: 16px;
+  }
+}
+
 body {
   background: var(--color-canvas);
   color: var(--color-ink);

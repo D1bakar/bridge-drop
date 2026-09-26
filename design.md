@@ -93,6 +93,8 @@ Amendment 24 Sep 2026 (owner override): restrained warm elevation allowed on nes
 
 Amendment 25 Sep 2026 (owner override): Apple-like structure WITHOUT color. Monochrome palette (§2) is binding — Warm Obsidian on Bone White, no accent, no blue. Adopted from Apple: SF system font stack first, filled primary buttons (Ink fill, Canvas text), 17 px body for UI text, card surfaces (Canvas fill, Ash hairline, 12–16 px radius) for rows/zones, bottom tab bar on phone. Rolled out one surface per branch in `css/apple.css`; base tokens and text-link components stay until their slice lands.
 
+Amendment 26 Sep 2026 (HIG layout pass, developer.apple.com/design/human-interface-guidelines/layout): phone follows HIG compact metrics — 16 pt screen-edge margin (`--edge: 16px` under 720 px), 8 pt spacing unit (no off-grid phone values), 16 pt card internal padding (`--surface-pad: 16px` on phone), 44 pt minimum touch targets (already met via `--hit-min: 48px`, tab bar 56 px), safe-area insets on all four edges (already wired, keep). Desktop keeps the 40 px source-style edge (tray utility, not an iOS width class). Deliberate deviations: phone `--section-gap` stays 24 px (compact Home override, HIG section spacing is 32 pt) and the tab bar stays floating Liquid Glass instead of edge-to-edge.
+
 6. Components
 Wordmark [S]
 
