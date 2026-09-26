@@ -35,3 +35,13 @@ def test_text_positions():
     pages = client.get("/css/pages.css").text
     assert "margin-top: 48px" not in pages
     assert "font-size: 28px" in pages
+
+
+def test_box_rows_aligned():
+    home = client.get("/css/home.css").text
+    assert ".recent-side" in home
+    assert "min-width: 80px" in home
+    assert "justify-content: flex-start" in home
+    feed = client.get("/js/feed.js").text
+    assert "recent-side" in feed
+    assert "recent-side" in client.get("/js/mock.js").text
