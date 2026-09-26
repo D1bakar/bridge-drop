@@ -132,3 +132,9 @@ def test_resume_key_ignores_size_change():
     assert other["resumed"] is False
     assert client.delete(f"/v1/uploads/{uid}").status_code == 200
     assert client.delete(f"/v1/uploads/{other['uploadId']}").status_code == 200
+
+
+def test_send_page_sends_stable_key():
+    js = client.get("/js/batch.js").text
+    assert "client_key" in js
+    assert "Resumed" in js
