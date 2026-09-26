@@ -100,3 +100,41 @@ def test_rules_route_by_extension():
         shutil.rmtree(UPLOAD_ROOT / "Videos")
     finally:
         db.set_setting("rules", "[]")
+
+
+def test_init_reattaches_interrupted_upload():
+    data = b"interrupt me please...."
+    first = client.post("/v1/uploads/init", json={
+        "name": "big.iso", "size": len(data), "client_key": "fp-1"}).json()
+    assert first["resumed"] is False
+    uid = first["uploadId"]
+    assert _put(uid, data[:8], 0).json()["offset"] == 8
+    # Tab killed, tab reopened: same key re-attaches at confirmed bytes.
+    again = client.post("/v1/uploads/init", json={
+        "name": "big.iso", "size": len(data), "client_key": "fp-1"}).json()
+    assert again["uploadId"] == uid
+    assert again["offset"] == 8
+    assert again["resumed"] is True
+    assert _put(uid, data[8:], 8).json()["offset"] == len(data)
+    assert client.post(f"/v1/uploads/{uid}/complete").status_code == 200
+    assert (UPLOAD_ROOT / "big.iso").read_bytes() == data
+    (UPLOAD_ROOT / "big.iso").unlink()
+
+
+def test_resume_key_ignores_size_change():
+    data = b"changed file!!"
+    uid = client.post("/v1/uploads/init", json={
+        "name": "edit.bin", "size": len(data), "client_key": "fp-2"}).json()["uploadId"]
+    assert _put(uid, data[:4], 0).status_code == 200
+    other = client.post("/v1/uploads/init", json={
+        "name": "edit.bin", "size": len(data) + 10, "client_key": "fp-2"}).json()
+    assert other["uploadId"] != uid
+    assert other["resumed"] is False
+    assert client.delete(f"/v1/uploads/{uid}").status_code == 200
+    assert client.delete(f"/v1/uploads/{other['uploadId']}").status_code == 200
+
+
+def test_send_page_sends_stable_key():
+    js = client.get("/js/batch.js").text
+    assert "client_key" in js
+    assert "Resumed" in js

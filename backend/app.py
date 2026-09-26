@@ -619,6 +619,19 @@ def uploads_init(payload: dict, request: Request):
     sha_exp = str(payload.get("sha256", "") or "")
     if sha_exp and (len(sha_exp) != 64 or any(c not in "0123456789abcdefABCDEF" for c in sha_exp)):
         raise HTTPException(status_code=422, detail="bad sha256")
+    client_key = str(payload.get("client_key", "") or "")[:128]
+    if client_key:
+        # Resume: same peer re-attaches to its interrupted upload, if any.
+        with db.connect() as conn:
+            row = conn.execute(
+                "SELECT * FROM chunked WHERE peer_id=? AND client_key=? AND size=?"
+                " AND status='uploading' AND bytes_done>0"
+                " ORDER BY created_at DESC LIMIT 1",
+                (peer_id, client_key, size)).fetchone()
+            if row:
+                u = dict(row)
+                return {"uploadId": u["id"], "offset": u["bytes_done"],
+                        "size": u["size"], "resumed": True}
     uid = uuid.uuid4().hex[:12]
     save_dir = ""
     sub = rule_dir_for(name)
@@ -634,13 +647,14 @@ def uploads_init(payload: dict, request: Request):
     with db.connect() as conn:
         conn.execute(
             "INSERT INTO chunked(id, peer_id, name, rel_path, save_dir, size, mime,"
-            " sha256_expected, bytes_done, tmp_name, final_name, status, created_at)"
-            " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            " sha256_expected, bytes_done, tmp_name, final_name, status, created_at,"
+            " client_key)"
+            " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (uid, peer_id, name, rel, save_dir, size, mime, sha_exp.lower(),
-             0, tmp.name, "", "uploading", db.now()),
+             0, tmp.name, "", "uploading", db.now(), client_key),
         )
         conn.commit()
-    return {"uploadId": uid, "offset": 0, "size": size}
+    return {"uploadId": uid, "offset": 0, "size": size, "resumed": False}
 
 
 @app.get("/v1/uploads/{uid}/status")
