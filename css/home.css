@@ -225,8 +225,114 @@ body {
   }
 }
 
-/* Drop zone hero — the transfer surface dominates Home: tall, airy,
- * label set large. Drag-over deepens border + label per design §6. */
+/* Eyebrow connection status — words only, offline dims (no layout shift). */
+.eyebrow {
+  font-size: var(--text-label);
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: var(--leading-small);
+  color: var(--color-ink);
+  opacity: 0.6;
+  margin: var(--space-3) 0 0;
+}
+
+.eyebrow.is-offline {
+  opacity: 0.4;
+}
+
+/* Transfer field — spatial hero. Idle: open, borderless, calm.
+ * Presence arrives only when a drag enters the page. */
+.field {
+  position: relative;
+  margin-top: var(--space-4);
+  min-height: 52vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-align: center;
+  border: 1px solid transparent;
+  border-radius: var(--r-xl);
+}
+
+.bridge-mark {
+  width: 112px;
+  height: auto;
+  color: var(--color-ink);
+}
+
+.bridge-mark.is-loading .bridge-pulse {
+  animation: bridge-breathe 1.2s ease-in-out infinite;
+}
+
+@keyframes bridge-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.25; }
+}
+
+/* Page drag mode: nav + siblings recede, the field materializes. */
+body.is-dragging #home > :not(.field) {
+  opacity: 0.25;
+}
+
+body.is-dragging .tabbar {
+  opacity: 0.15;
+}
+
+body.is-dragging .field {
+  border-color: var(--color-ink);
+  background: rgba(38, 37, 35, 0.04);
+  min-height: 60vh;
+}
+
+body.is-dragging .dropzone-label {
+  font-size: var(--type-t1);
+}
+
+/* Direct hover on the field: 2 px ink edge, label steps up. */
+.field.is-dragover {
+  border: 2px solid var(--color-ink);
+  background: rgba(38, 37, 35, 0.05);
+}
+
+.field.is-dragover .dropzone-label {
+  font-size: var(--type-t1);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body.is-dragging #home > :not(.field),
+  body.is-dragging .tabbar,
+  body.is-dragging .field,
+  body.is-dragging .dropzone-label {
+    transition: opacity var(--duration) var(--ease),
+      border-color var(--duration) var(--ease),
+      background-color var(--duration) var(--ease),
+      font-size var(--duration) var(--ease),
+      min-height var(--duration) var(--ease);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bridge-mark.is-loading .bridge-pulse {
+    animation: none;
+  }
+}
+
+@media (max-width: 719px) {
+  .field {
+    min-height: 44vh;
+  }
+
+  body.is-dragging .field {
+    min-height: 52vh;
+  }
+
+  .bridge-mark {
+    width: 88px;
+  }
+}
 .dropzone {
   margin-top: var(--space-4);
   background: transparent;

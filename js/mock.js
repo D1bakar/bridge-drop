@@ -127,16 +127,15 @@ function fmtTime(mtime) {
 }
 
 function setNetStatus(live, reason) {
-  // Design §6 status without color: words + border weight carry the meaning.
-  const pill = document.getElementById('net-status');
-  if (!pill) return;
-  pill.textContent = live ? 'Live' : 'Mock';
-  if (live) {
-    pill.classList.remove('pill-attention');
-    pill.removeAttribute('title');
+  // Eyebrow status in words; offline dims instead of boxing (no layout shift).
+  const el = document.getElementById('net-status');
+  if (!el) return;
+  el.textContent = live ? 'Live' : 'Mock';
+  el.classList.toggle('is-offline', !live);
+  if (!live && reason) {
+    el.title = reason;
   } else {
-    pill.classList.add('pill-attention');
-    if (reason) pill.title = reason;
+    el.removeAttribute('title');
   }
 }
 

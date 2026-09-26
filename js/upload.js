@@ -22,9 +22,9 @@ function setDropLabel(text) {
 }
 
 function setLoading(on) {
-  // Monument star spins while bytes move; null-safe off Home.
-  const glyph = document.querySelector(".glyph");
-  if (glyph) glyph.classList.toggle("is-loading", !!on);
+  // Bridge mark breathes while bytes move; null-safe off Home.
+  const mark = document.querySelector(".bridge-mark") || document.querySelector(".glyph");
+  if (mark) mark.classList.toggle("is-loading", !!on);
 }
 
 function uploadFile(file) {
