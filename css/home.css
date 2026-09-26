@@ -32,6 +32,8 @@ html {
   }
 }
 
+/* Atmosphere: one still light field behind everything. Overhead light,
+ * no color, no blobs — fixed so long pages keep the same sky. */
 body {
   min-height: 100vh;
   padding-left: max(var(--edge), env(safe-area-inset-left));
@@ -39,6 +41,16 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+  background:
+    radial-gradient(120% 42% at 50% -6%, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 70%) fixed,
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 32%) fixed,
+    var(--color-canvas);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  body {
+    background: var(--color-canvas);
+  }
 }
 
 /* Wordmark — design.md §6: Basis/Inter 700, 32px, ink, top-left at edge padding */
