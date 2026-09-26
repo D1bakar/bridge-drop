@@ -454,6 +454,21 @@ section > .pill {
   flex-shrink: 0;
 }
 
+/* Trailing cluster: right-aligned, even rhythm between pill + actions. */
+.recent-side {
+  margin-left: auto;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.recent-side > * {
+  vertical-align: middle;
+}
+
+.recent-side > * + * {
+  margin-left: 16px;
+}
+
 /* Server-backed rows: name stays ink, no underline — tap opens the file */
 a.recent-name {
   color: var(--color-ink);

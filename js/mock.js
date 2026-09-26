@@ -334,12 +334,16 @@ function renderRecent(items = MOCK_RECENT, base = '') {
     main.appendChild(nameEl);
     main.appendChild(meta);
 
+    li.appendChild(main);
+
+    // Trailing pill + actions: one right-aligned cluster per row.
+    const side = document.createElement('div');
+    side.className = 'recent-side';
+
     const pill = document.createElement('span');
     pill.className = 'pill' + (r.pending ? ' pill-attention' : '');
     pill.textContent = r.pending ? 'Waiting' : r.direction;
-
-    li.appendChild(main);
-    li.appendChild(pill);
+    side.appendChild(pill);
 
     // Every row you shared or received can go: history row + file, together.
     if (r.acceptId && base) {
@@ -365,8 +369,8 @@ function renderRecent(items = MOCK_RECENT, base = '') {
           toast('Decline failed — try again.', { sticky: true });
         }
       });
-      li.appendChild(acc);
-      li.appendChild(dec);
+      side.appendChild(acc);
+      side.appendChild(dec);
     } else if (r.onDelete && base) {
       const del = actionLink('Delete');
       confirmDelete(del, async () => {
@@ -378,8 +382,9 @@ function renderRecent(items = MOCK_RECENT, base = '') {
           toast('Delete failed — try again.', { sticky: true });
         }
       });
-      li.appendChild(del);
+      side.appendChild(del);
     }
+    li.appendChild(side);
     list.appendChild(li);
   });
 }
