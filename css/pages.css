@@ -36,6 +36,8 @@
   height: 2px;
   width: 0%;
   background: var(--color-ink);
+  /* Linear tracking: smooths chunk jumps without editorializing speed. */
+  transition: width 150ms linear;
 }
 
 .transfer-meta {
@@ -72,6 +74,7 @@
   height: 1px;
   width: 0%;
   background: var(--color-ink);
+  transition: width 150ms linear;
 }
 
 /* Pairing block — design §6: QR ink-on-canvas, quiet zone kept, nested surface. */
@@ -194,6 +197,25 @@
 
 .toast.is-fading {
   opacity: 0;
+}
+
+/* Sheet entrance: rises into place once, exits by fade. Gated below. */
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    animation: toast-in var(--duration) var(--ease-spring);
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

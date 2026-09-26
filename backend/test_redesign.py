@@ -32,3 +32,10 @@ def test_dock_owns_navigation():
     assert ".topnav {\n  display: none;" in apple
     assert ".tabbar {\n  display: flex;" in apple
     assert "translateX(-50%)" in apple
+
+
+def test_motion_explains_state():
+    pages = client.get("/css/pages.css").text
+    assert "toast-in" in pages
+    assert "prefers-reduced-motion: no-preference" in pages
+    assert "transition: width 150ms linear" in pages
