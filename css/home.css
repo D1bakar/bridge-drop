@@ -111,8 +111,8 @@ body {
  * overrides below only. Desktop (≥720px) unchanged. */
 @media (max-width: 719px) {
   :root {
-    --above-monument: 48px;
-    --section-gap: 32px;
+    --above-monument: 32px;
+    --section-gap: 24px;
     --surface-pad: 20px;
   }
 
@@ -126,7 +126,7 @@ body {
   }
 
   .dropzone {
-    min-height: 160px;
+    min-height: 120px;
     margin-top: var(--space-2);
   }
 
@@ -141,6 +141,15 @@ body {
 
   .recent-row {
     padding: 12px 0;
+  }
+
+  /* One-line composer until focus — compact Home, grows like iOS. */
+  .snippet-form .field-area {
+    min-height: 48px;
+  }
+
+  .snippet-form .field-area:focus {
+    min-height: 96px;
   }
 
   .recent-empty-title {

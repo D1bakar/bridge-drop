@@ -166,6 +166,11 @@ input[type="range"].clarity-range {
     margin-top: 24px;
   }
 
+  /* Compact first fold — Send button hugs the monument on phone. */
+  .action-primary {
+    margin-top: var(--space-2);
+  }
+
   .tabbar {
     display: flex;
     position: fixed;
