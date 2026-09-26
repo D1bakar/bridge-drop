@@ -34,9 +34,13 @@
     bar.addEventListener('click', function (e) {
       var a = e.target && e.target.closest ? e.target.closest('a') : null;
       if (!a || a.getAttribute('aria-current') === 'page') return;
+      // Let new-tab / new-window gestures use the browser default.
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || (e.button !== undefined && e.button !== 0)) return;
+      var href = a.getAttribute('href');
+      // Reduced-motion users: no glide delay, navigate instantly (design.md S7).
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       e.preventDefault();
       place(ind, a);
-      var href = a.getAttribute('href');
       setTimeout(function () { window.location.href = href; }, 230);
     });
   });
