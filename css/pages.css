@@ -250,11 +250,11 @@ main {
   /* iOS 27 large title locked at 34px (apple.css) — no competing scale here. */
   .page-heading {
     font-size: 34px;
-    margin-top: 48px;
   }
 
+  /* Numerals rank below the 34 px title (HIG Title 1). */
   .transfer-pct {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .pair-block {
@@ -267,7 +267,7 @@ main {
   }
 
   .pair-code {
-    font-size: 32px;
+    font-size: 28px;
   }
 
   .pending {
