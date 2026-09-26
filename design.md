@@ -97,6 +97,8 @@ Amendment 26 Sep 2026 (HIG layout pass, developer.apple.com/design/human-interfa
 
 Amendment 26 Sep 2026 (HIG design principles, developer.apple.com/design/human-interface-guidelines/design-principles): feedback must persist on failure (success toasts auto-dismiss 4 s, error toasts stay until tapped — `role="status"` already announces both); destructive deletes need forgiveness (two-tap arm-and-confirm, files + snippets, Home preview + History); progress stays visible in place (dropzone label, batch numeral) and is announced via `aria-live="polite"`; words stay in the user's vocabulary (no error codes on screen); one consistent Delete pattern everywhere, no per-page inventions.
 
+Amendment 26 Sep 2026 (Liquid Glass system, HIG Materials / Adopting Liquid Glass / custom views): glass is a FUNCTIONAL layer only — tab bar, toasts, active pill, primary buttons. Content cards (devices, recent, settings, batch lists) are matte: hairline borders, no outer shadow, no highlight; hierarchy comes from type and spacing, never elevation. Two materials: regular (tab bar, alpha ~0.22 + blur/saturate/brightness, readable over any scroll position) and clear (reserved for future media overlays; never used for readability surfaces today). Motion is purposeful only — 200 ms ease-out base, spring easing reserved for the tab indicator glide and press recovery; star spin is loading feedback, not decoration. `prefers-reduced-transparency` renders every glass surface near-solid. No pointer-tracking spotlights (perf + restraint); tactility comes from opacity + instant press response.
+
 6. Components
 Wordmark [S]
 

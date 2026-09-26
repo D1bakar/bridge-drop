@@ -20,10 +20,35 @@
   /* Clarity slider (iOS 27 ultra-clear ↔ tinted), set by js/clarity.js. */
   --glass-alpha: 0.22;
   --glass-blur: 18px;
+  /* Material system — functional layer only, content cards stay matte.
+   * Regular: navigation + transient UI. Clear: reserved for media overlays. */
+  --glass-regular-blur: var(--glass-blur);
+  --glass-clear-alpha: 0.12;
+  --glass-border: 1px solid var(--color-ash);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  /* Motion: 200 ms base; spring reserved for indicator glide + press recovery. */
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-fast: 150ms;
+  /* Layer hierarchy: content < nav < transient. */
+  --z-nav: 50;
+  --z-toast: 60;
 }
 
 body {
   font-family: var(--font-apple);
+}
+
+/* Transient UI floats above navigation (toast sits clear of the tab bar). */
+.toast {
+  z-index: var(--z-toast);
+}
+
+/* Reduce Transparency: glass goes near-solid, hierarchy preserved. */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-alpha: 0.94;
+    --glass-blur: 4px;
+  }
 }
 
 /* iOS-like page arrival — still, instant for reduced-motion users. */
@@ -97,6 +122,8 @@ input[type="range"].clarity-range {
 
 .action-primary:active {
   opacity: var(--opacity-pressed);
+  /* Press lands fast, release recovers slow — tactile without scale. */
+  transition-duration: var(--motion-fast);
 }
 
 @media (hover: hover) {
@@ -110,8 +137,9 @@ input[type="range"].clarity-range {
   outline-offset: 4px;
 }
 
-/* Grouped glass cards — iOS inset-grouped lists, monochrome.
- * Container card, inset dividers, soft lift. Covers Home, History, Pair, Settings, Send. */
+/* Grouped content lists — MATTE content layer, never glass.
+ * Separation comes from fill + hairline only; hierarchy from type + spacing.
+ * (Drop zone keeps its restrained depth: it is an interactive surface.) */
 .devices,
 .recent-list,
 .settings-list,
@@ -120,8 +148,7 @@ input[type="range"].clarity-range {
   border: 1px solid var(--color-ash);
   border-radius: var(--apple-card-radius);
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(38, 37, 35, 0.06),
-    0 8px 20px rgba(38, 37, 35, 0.08);
+  box-shadow: none;
 }
 
 .devices .device,
@@ -178,7 +205,7 @@ input[type="range"].clarity-range {
     left: 16px;
     right: 16px;
     bottom: calc(16px + env(safe-area-inset-bottom));
-    z-index: 50;
+    z-index: var(--z-nav);
     /* Liquid Glass, monochrome: clear Canvas, top light-bend, Ash edge, Ink text. */
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 42%),
@@ -188,6 +215,17 @@ input[type="range"].clarity-range {
     border: 1px solid var(--color-ash);
     border-radius: 24px;
     box-shadow: var(--shadow-glass);
+    transition: border-color var(--duration) var(--ease),
+      box-shadow var(--duration) var(--ease);
+  }
+
+  /* Scroll edge: content passing beneath densifies the bar's separation. */
+  .tabbar.is-scrolled {
+    border-color: rgba(38, 37, 35, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8),
+      inset 0 -1px 0 rgba(38, 37, 35, 0.1),
+      0 1px 2px rgba(38, 37, 35, 0.12),
+      0 16px 40px rgba(38, 37, 35, 0.22);
   }
 
   .tabbar a {
@@ -220,9 +258,10 @@ input[type="range"].clarity-range {
 
   .tabbar a:active {
     opacity: var(--opacity-pressed);
+    transition-duration: var(--motion-fast);
   }
 
-  /* Gliding selection pill — placed by js/tabbar.js, 200ms slide (design.md S7). */
+  /* Gliding selection pill — placed by js/tabbar.js, spring glide (design.md S7). */
   .tab-indicator {
     position: absolute;
     top: 6px;
@@ -233,7 +272,7 @@ input[type="range"].clarity-range {
     background: rgba(38, 37, 35, 0.05);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5),
       inset 0 -1px 0 rgba(38, 37, 35, 0.08);
-    transition: left var(--duration) var(--ease), width var(--duration) var(--ease);
+    transition: left var(--duration) var(--ease-spring), width var(--duration) var(--ease-spring);
     z-index: 0;
   }
 

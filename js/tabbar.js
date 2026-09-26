@@ -31,6 +31,12 @@
     window.addEventListener('resize', repin);
     window.addEventListener('load', repin);
     if (document.fonts && document.fonts.ready) { document.fonts.ready.then(repin); }
+    // Scroll edge: densify separation once content slides beneath the bar.
+    function onScroll() {
+      bar.classList.toggle('is-scrolled', window.scrollY > 8);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
     bar.addEventListener('click', function (e) {
       var a = e.target && e.target.closest ? e.target.closest('a') : null;
       if (!a || a.getAttribute('aria-current') === 'page') return;
