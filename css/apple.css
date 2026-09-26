@@ -20,10 +20,27 @@
   /* Clarity slider (iOS 27 ultra-clear ↔ tinted), set by js/clarity.js. */
   --glass-alpha: 0.22;
   --glass-blur: 18px;
+  /* Material system — functional layer only, content cards stay matte.
+   * Regular: navigation + transient UI. Clear: reserved for media overlays. */
+  --glass-regular-blur: var(--glass-blur);
+  --glass-clear-alpha: 0.12;
+  --glass-border: 1px solid var(--color-ash);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  /* Motion: 200 ms base; spring reserved for indicator glide + press recovery. */
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --motion-fast: 150ms;
+  /* Layer hierarchy: content < nav < transient. */
+  --z-nav: 50;
+  --z-toast: 60;
 }
 
 body {
   font-family: var(--font-apple);
+}
+
+/* Transient UI floats above navigation (toast sits clear of the tab bar). */
+.toast {
+  z-index: var(--z-toast);
 }
 
 /* iOS-like page arrival — still, instant for reduced-motion users. */
@@ -178,7 +195,7 @@ input[type="range"].clarity-range {
     left: 16px;
     right: 16px;
     bottom: calc(16px + env(safe-area-inset-bottom));
-    z-index: 50;
+    z-index: var(--z-nav);
     /* Liquid Glass, monochrome: clear Canvas, top light-bend, Ash edge, Ink text. */
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 42%),
