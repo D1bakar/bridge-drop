@@ -168,6 +168,27 @@ function actionLink(label) {
   return a;
 }
 
+// Same two-tap delete as history.js feed (HIG forgiveness, one pattern).
+function confirmDelete(linkEl, run) {
+  let armed = false;
+  let timer = null;
+  const original = linkEl.innerHTML;
+  linkEl.addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (!armed) {
+      armed = true;
+      linkEl.innerHTML = 'Sure? <span aria-hidden="true">→</span>';
+      timer = setTimeout(() => {
+        armed = false;
+        linkEl.innerHTML = original;
+      }, 3000);
+      return;
+    }
+    clearTimeout(timer);
+    await run();
+  });
+}
+
 async function apiDelete(path, base) {
   const headers = {};
   try {
@@ -178,8 +199,8 @@ async function apiDelete(path, base) {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
 
-function toast(text) {
-  if (window.BridgeApi) window.BridgeApi.toast(text);
+function toast(text, opts) {
+  if (window.BridgeApi) window.BridgeApi.toast(text, opts);
 }
 
 async function refreshRecentFromServer() {
@@ -330,7 +351,7 @@ function renderRecent(items = MOCK_RECENT, base = '') {
           toast('Received →');
           refreshRecentFromServer();
         } catch (_) {
-          toast('Accept failed — try again.');
+          toast('Accept failed — try again.', { sticky: true });
         }
       });
       const dec = actionLink('Decline');
@@ -341,21 +362,20 @@ function renderRecent(items = MOCK_RECENT, base = '') {
           toast('Declined →');
           refreshRecentFromServer();
         } catch (_) {
-          toast('Decline failed — try again.');
+          toast('Decline failed — try again.', { sticky: true });
         }
       });
       li.appendChild(acc);
       li.appendChild(dec);
     } else if (r.onDelete && base) {
       const del = actionLink('Delete');
-      del.addEventListener('click', async (e) => {
-        e.preventDefault();
+      confirmDelete(del, async () => {
         try {
           await r.onDelete();
           toast('Deleted →');
           refreshRecentFromServer();
         } catch (_) {
-          toast('Delete failed — try again.');
+          toast('Delete failed — try again.', { sticky: true });
         }
       });
       li.appendChild(del);

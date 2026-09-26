@@ -91,7 +91,8 @@
     return { base: out.base, data: await out.res.json() };
   }
 
-  function toast(text) {
+  // Success toasts auto-dismiss; failure toasts stay until tapped (HIG feedback).
+  function toast(text, opts) {
     var old = document.querySelector('.toast');
     if (old) old.remove();
     var el = document.createElement('div');
@@ -99,6 +100,11 @@
     el.setAttribute('role', 'status');
     el.textContent = text;
     document.body.appendChild(el);
+    if (opts && opts.sticky) {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', function () { el.remove(); });
+      return;
+    }
     setTimeout(function () {
       el.classList.add('is-fading');
       setTimeout(function () { el.remove(); }, 250);
