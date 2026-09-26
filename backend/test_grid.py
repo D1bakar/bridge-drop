@@ -27,3 +27,11 @@ def test_one_text_column():
     assert "section > .pill" in home
     apple = client.get("/css/apple.css").text
     assert "margin: 0 15px" in apple
+
+
+def test_text_positions():
+    apple = client.get("/css/apple.css").text
+    assert "bottom: calc(96px + env(safe-area-inset-bottom))" in apple
+    pages = client.get("/css/pages.css").text
+    assert "margin-top: 48px" not in pages
+    assert "font-size: 28px" in pages
