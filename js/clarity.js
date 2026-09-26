@@ -1,12 +1,12 @@
 /* Bridge clarity — iOS 27 ultra-clear ↔ frosted glass slider.
  * Stored per device (localStorage), applied on every page before paint matters.
- * 0 = ultra-clear (alpha .45, blur 12px), 100 = frosted (alpha .92, blur 28px).
+ * 0 = ultra-clear (alpha .30, blur 12px), 100 = frosted (alpha .92, blur 28px).
  */
 (function () {
   'use strict';
 
   var KEY = 'bridge-clarity';
-  var DEFAULT = 60;
+  var DEFAULT = 15;
 
   function read() {
     try {
@@ -17,7 +17,7 @@
   }
 
   function apply(v) {
-    var alpha = (0.45 + (v / 100) * 0.47).toFixed(2);
+    var alpha = (0.30 + (v / 100) * 0.62).toFixed(2);
     var blur = Math.round(12 + (v / 100) * 16) + 'px';
     var root = document.documentElement;
     root.style.setProperty('--glass-alpha', alpha);
@@ -26,7 +26,7 @@
       localStorage.setItem(KEY, String(v));
     } catch (_) {}
     var label = document.getElementById('clarity-value');
-    if (label) label.textContent = v <= 33 ? 'Ultra-clear' : (v <= 66 ? 'Balanced' : 'Frosted');
+    if (label) label.textContent = v <= 25 ? 'Ultra-clear' : (v <= 65 ? 'Balanced' : 'Frosted');
   }
 
   function init() {
