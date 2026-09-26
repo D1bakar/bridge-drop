@@ -6,7 +6,7 @@
   'use strict';
 
   var KEY = 'bridge-clarity';
-  var DEFAULT = 60;
+  var DEFAULT = 15;
 
   function read() {
     try {
