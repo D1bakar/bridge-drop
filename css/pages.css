@@ -196,6 +196,25 @@
   opacity: 0;
 }
 
+/* Sheet entrance: rises into place once, exits by fade. Gated below. */
+@media (prefers-reduced-motion: no-preference) {
+  .toast {
+    animation: toast-in var(--duration) var(--ease-spring);
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .toast {
     transition: none;
