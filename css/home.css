@@ -272,6 +272,53 @@ body {
   50% { opacity: 0.25; }
 }
 
+/* Destination anchor: the device this field sends to. Quiet row,
+ * state carried by the dot + words (mono, no color). */
+.dest {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--space-2);
+  min-height: var(--hit-min);
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.dest-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-ink);
+  flex-shrink: 0;
+}
+
+.dest-name {
+  font-size: var(--type-body);
+  font-weight: var(--w-med);
+  letter-spacing: -0.02em;
+}
+
+.dest-state {
+  font-size: var(--type-foot);
+  opacity: 0.6;
+}
+
+.dest[data-state="offline"] .dest-dot,
+.dest[data-state="checking"] .dest-dot {
+  opacity: 0.3;
+}
+
+/* Transferring: the dot breathes with the bridge mark. */
+body.is-transferring .dest-dot {
+  animation: bridge-breathe 1.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.is-transferring .dest-dot {
+    animation: none;
+  }
+}
+
 /* Page drag mode: nav + siblings recede, the field materializes. */
 body.is-dragging #home > :not(.field) {
   opacity: 0.25;

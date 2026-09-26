@@ -23,6 +23,10 @@ function renderDevices(devices = MOCK_DEVICES) {
   devices.forEach((d, i) => {
     const li = document.createElement('li');
     li.className = i === 0 ? 'device is-selected' : 'device';
+    if (i === 0) {
+      const dn = document.getElementById('dest-name');
+      if (dn) dn.textContent = d.name;
+    }
 
     const main = document.createElement('div');
     main.className = 'device-main';
@@ -128,14 +132,22 @@ function fmtTime(mtime) {
 
 function setNetStatus(live, reason) {
   // Eyebrow status in words; offline dims instead of boxing (no layout shift).
+  // Destination anchor mirrors the same state (R2 device object).
   const el = document.getElementById('net-status');
-  if (!el) return;
-  el.textContent = live ? 'Live' : 'Mock';
-  el.classList.toggle('is-offline', !live);
-  if (!live && reason) {
-    el.title = reason;
-  } else {
-    el.removeAttribute('title');
+  if (el) {
+    el.textContent = live ? 'Live' : 'Mock';
+    el.classList.toggle('is-offline', !live);
+    if (!live && reason) {
+      el.title = reason;
+    } else {
+      el.removeAttribute('title');
+    }
+  }
+  const dest = document.getElementById('dest');
+  const dstate = document.getElementById('dest-state');
+  if (dest && dstate) {
+    dest.dataset.state = live ? 'connected' : 'offline';
+    dstate.textContent = live ? 'Connected' : 'Offline';
   }
 }
 

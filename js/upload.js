@@ -25,6 +25,9 @@ function setLoading(on) {
   // Bridge mark breathes while bytes move; null-safe off Home.
   const mark = document.querySelector(".bridge-mark") || document.querySelector(".glyph");
   if (mark) mark.classList.toggle("is-loading", !!on);
+  try {
+    document.body.classList.toggle("is-transferring", !!on);
+  } catch (_) {}
 }
 
 function uploadFile(file) {
