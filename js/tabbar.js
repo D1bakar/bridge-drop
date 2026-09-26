@@ -24,10 +24,13 @@
     if (cur) place(ind, cur);
     void ind.offsetWidth;
     requestAnimationFrame(function () { ind.style.transition = ''; });
-    window.addEventListener('resize', function () {
+    function repin() {
       var c = bar.querySelector('a[aria-current="page"]');
       if (c) place(ind, c);
-    });
+    }
+    window.addEventListener('resize', repin);
+    window.addEventListener('load', repin);
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(repin); }
     bar.addEventListener('click', function (e) {
       var a = e.target && e.target.closest ? e.target.closest('a') : null;
       if (!a || a.getAttribute('aria-current') === 'page') return;
