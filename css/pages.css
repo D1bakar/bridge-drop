@@ -259,7 +259,7 @@ main {
 
   .pair-block {
     display: block;
-    padding: 20px;
+    padding: var(--surface-pad);
   }
 
   .pair-qr {
@@ -271,6 +271,6 @@ main {
   }
 
   .pending {
-    padding: 20px;
+    padding: var(--surface-pad);
   }
 }

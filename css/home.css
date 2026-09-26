@@ -113,7 +113,7 @@ body {
   :root {
     --above-monument: 32px;
     --section-gap: 24px;
-    --surface-pad: 20px;
+    --surface-pad: 16px;
   }
 
   .monument {
