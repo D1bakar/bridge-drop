@@ -1,12 +1,14 @@
 /* Bridge clarity — iOS 27 ultra-clear ↔ frosted glass slider.
  * Stored per device (localStorage), applied on every page before paint matters.
- * 0 = ultra-clear (alpha .30, blur 12px), 100 = frosted (alpha .92, blur 28px).
+ * 0 = ultra-clear (alpha .16, blur 12px), 100 = frosted (alpha .92, blur 28px).
+ * Note: true pixel refraction isn't possible in CSS — liquid feel comes from
+ * low alpha + blur/saturate + specular edge light (css/apple.css).
  */
 (function () {
   'use strict';
 
   var KEY = 'bridge-clarity';
-  var DEFAULT = 15;
+  var DEFAULT = 8;
 
   function read() {
     try {
@@ -17,7 +19,7 @@
   }
 
   function apply(v) {
-    var alpha = (0.30 + (v / 100) * 0.62).toFixed(2);
+    var alpha = (0.16 + (v / 100) * 0.76).toFixed(2);
     var blur = Math.round(12 + (v / 100) * 16) + 'px';
     var root = document.documentElement;
     root.style.setProperty('--glass-alpha', alpha);
