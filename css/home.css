@@ -609,11 +609,22 @@ section > .pill {
   box-shadow: var(--shadow-thumb);
 }
 
-/* Empty state — design.md §6: heading text, one → link, no illustration */
+/* Empty state — design.md §6: heading text, one → link, no illustration.
+ * Same 16px text column as rows: inset, stacked, left-aligned. */
 .recent-empty {
+  margin: 0 15px;
   padding: var(--space-2) 0;
-  border-top: var(--hairline);
-  border-bottom: var(--hairline);
+  border: none;
+  border-bottom: 1px solid var(--color-ash);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.recent-empty:last-child {
+  border-bottom: none;
 }
 
 .recent-empty-title {
@@ -623,6 +634,14 @@ section > .pill {
   letter-spacing: -0.02em;
   font-weight: var(--weight-regular);
   color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.recent-empty .action-secondary {
+  margin-top: 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .recent-main {

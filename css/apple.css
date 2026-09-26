@@ -154,7 +154,11 @@ input[type="range"].clarity-range {
 .devices .device,
 .recent-list .recent-row,
 .settings-list .settings-row,
-.batch-list .batch-row {
+.batch-list .batch-row,
+.devices .recent-empty,
+.recent-list .recent-empty,
+.settings-list .recent-empty,
+.batch-list .recent-empty {
   border-top: none;
   border-bottom: 1px solid var(--color-ash);
   /* 15 px + 1 px card border = 16 px text column, exact. */
@@ -166,7 +170,11 @@ input[type="range"].clarity-range {
 .devices .device:last-child,
 .recent-list .recent-row:last-child,
 .settings-list .settings-row:last-child,
-.batch-list .batch-row:last-child {
+.batch-list .batch-row:last-child,
+.devices .recent-empty:last-child,
+.recent-list .recent-empty:last-child,
+.settings-list .recent-empty:last-child,
+.batch-list .recent-empty:last-child {
   border-bottom: none;
 }
 
