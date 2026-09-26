@@ -126,7 +126,7 @@ body {
   }
 
   .dropzone {
-    min-height: 160px;
+    min-height: 120px;
     margin-top: var(--space-2);
   }
 
