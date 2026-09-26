@@ -127,8 +127,9 @@ input[type="range"].clarity-range {
   outline-offset: 4px;
 }
 
-/* Grouped glass cards — iOS inset-grouped lists, monochrome.
- * Container card, inset dividers, soft lift. Covers Home, History, Pair, Settings, Send. */
+/* Grouped content lists — MATTE content layer, never glass.
+ * Separation comes from fill + hairline only; hierarchy from type + spacing.
+ * (Drop zone keeps its restrained depth: it is an interactive surface.) */
 .devices,
 .recent-list,
 .settings-list,
@@ -137,8 +138,7 @@ input[type="range"].clarity-range {
   border: 1px solid var(--color-ash);
   border-radius: var(--apple-card-radius);
   overflow: hidden;
-  box-shadow: 0 1px 2px rgba(38, 37, 35, 0.06),
-    0 8px 20px rgba(38, 37, 35, 0.08);
+  box-shadow: none;
 }
 
 .devices .device,
