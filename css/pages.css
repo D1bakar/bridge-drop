@@ -247,8 +247,9 @@ main {
 /* Compact mobile density for sub-pages — same rules as home: natural scroll,
  * tighter rhythm, desktop unchanged. */
 @media (max-width: 719px) {
+  /* iOS 27 large title locked at 34px (apple.css) — no competing scale here. */
   .page-heading {
-    font-size: clamp(40px, 13vw, 64px);
+    font-size: 34px;
     margin-top: 48px;
   }
 
