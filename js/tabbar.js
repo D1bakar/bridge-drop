@@ -19,7 +19,11 @@
     bar.appendChild(ind);
     bar.classList.add('has-glide');
     var cur = bar.querySelector('a[aria-current="page"]');
+    // First paint: park under active tab with no slide (else it glides in from Home/left:0).
+    ind.style.transition = 'none';
     if (cur) place(ind, cur);
+    void ind.offsetWidth;
+    requestAnimationFrame(function () { ind.style.transition = ''; });
     window.addEventListener('resize', function () {
       var c = bar.querySelector('a[aria-current="page"]');
       if (c) place(ind, c);
